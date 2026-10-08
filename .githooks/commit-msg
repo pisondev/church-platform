@@ -20,10 +20,18 @@ marker='noreply@anthropic\.com|cursoragent@cursor\.com|copilot@users\.noreply\.g
 # With `git commit -v` the diff sits below the scissors line; it is not part of the message.
 message=$(sed '/^# -\{24\} >8 -\{24\}$/,$d' "$msg_file")
 
+# Robot emoji (U+1F916) as UTF-8 bytes, matched with shell builtins only. Passing it to
+# grep as an argument stopped matching when the hook ran inside `git push` on Windows.
+robot=$(printf '\360\237\244\226')
+
 offending=$(
   {
     printf '%s\n' "$message" | grep -iE -e "$trailer" -e "$prose" -e "$marker"
-    printf '%s\n' "$message" | grep -F '🤖'
+    printf '%s\n' "$message" | while IFS= read -r line; do
+      case "$line" in
+        *"$robot"*) printf '%s\n' "$line" ;;
+      esac
+    done
   } | sort -u
 )
 
