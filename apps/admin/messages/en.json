@@ -85,7 +85,9 @@
       "next": "Next slide",
       "previous": "Previous slide",
       "first": "First slide",
-      "last": "Last slide"
+      "last": "Last slide",
+      "hidePanel": "Hide the slide panel",
+      "showPanel": "Show the slide panel"
     },
     "slideshow": "Slideshow",
     "presenting": "Slideshow",
@@ -103,6 +105,8 @@
     "nextScreen": "Next screen",
     "filmstrip": "Slides",
     "goTo": "Slide {number}: {kind}",
-    "empty": "This template has no slides yet."
+    "empty": "This template has no slides yet.",
+    "hidePanel": "Hide the slide panel",
+    "showPanel": "Show the slide panel"
   }
 }

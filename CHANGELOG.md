@@ -2,6 +2,16 @@
 
 All notable changes are recorded here, grouped by the date they landed, newest first. Inside a date the entries use the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) categories. Version numbers will follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once releases start.
 
+## 2026-10-09
+
+### Changed
+
+- Template editor layout: the header is one thin row, and the slides moved from a strip along the bottom to a numbered panel on the left that can be closed and reopened.
+
+### Fixed
+
+- The editor stage was blank when a development server served a stylesheet older than the one on disk. The slide is now sized inline.
+
 ## 2026-10-08
 
 ### Added

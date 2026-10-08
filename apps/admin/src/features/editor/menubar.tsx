@@ -44,7 +44,7 @@ export function Menubar({ label, menus }: { label: string; menus: MenuGroup[] })
             role="menuitem"
             aria-haspopup="menu"
             aria-expanded={open === index}
-            className="rounded px-2 py-0.5 text-sm hover:bg-black/5 aria-expanded:bg-black/10"
+            className="rounded px-2 py-1 text-sm hover:bg-black/5 aria-expanded:bg-black/10"
             onClick={() => setOpen(open === index ? null : index)}
             // With a menu open, moving along the bar switches menus.
             onMouseEnter={() => {

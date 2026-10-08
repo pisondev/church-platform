@@ -5,6 +5,9 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 const NEXT_KEYS = new Set(["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"]);
 const PREVIOUS_KEYS = new Set(["ArrowLeft", "ArrowUp", "PageUp", "Backspace"]);
 
+// As large as the screen allows at 16:9. Inline, so it never depends on a stylesheet.
+const FRAME_STYLE = { width: "min(100vw, calc(100vh * 16 / 9))" } as const;
+
 // Shows frames one at a time over the whole screen. It asks the browser for full screen
 // and still covers the page when that is refused. Escape, or leaving full screen, closes it.
 export function Presenter({
@@ -64,7 +67,7 @@ export function Presenter({
       className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-white"
       onClick={() => setIndex((current) => Math.min(last, current + 1))}
     >
-      <div className="present-frame">{frames[index]}</div>
+      <div style={FRAME_STYLE}>{frames[index]}</div>
     </div>
   );
 }

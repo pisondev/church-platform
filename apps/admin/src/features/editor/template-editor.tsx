@@ -1,10 +1,10 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, PanelLeftOpen, Play } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { BrandMark } from "@/components/brand-mark";
 import { displayName, useSession } from "@/features/session/session";
@@ -21,36 +21,43 @@ import { type RenameResult, TitleField } from "./title-field";
 const NEXT_KEYS = new Set(["ArrowRight", "ArrowDown", "PageDown"]);
 const PREVIOUS_KEYS = new Set(["ArrowLeft", "ArrowUp", "PageUp"]);
 
+// The slide keeps 16:9 and takes the largest size that fits the stage, with a margin.
+// These sizes are inline on purpose: the stage must never depend on a stylesheet that a
+// development server may serve stale, because without them the slide collapses to nothing.
+const STAGE_STYLE = { containerType: "size" } as const;
+const CANVAS_STYLE = { width: "min(calc(100cqw - 3rem), calc((100cqh - 3rem) * 16 / 9))" } as const;
+
+const iconButton = "inline-flex size-7 items-center justify-center rounded hover:bg-black/5 disabled:opacity-30";
+
 function isTextField(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
 }
 
-// The slide being worked on, fitted to the space it has. A responsive reading that takes
+// The slide being worked on, with a status line under it. A responsive reading that takes
 // several screens can be paged through here.
-function Stage({ slide, position }: { slide: TemplateSlide; position: string }) {
+function Stage({ slide, position, leading }: { slide: TemplateSlide; position: string; leading: ReactNode }) {
   const t = useTranslations("Editor");
   const screens = useMemo(() => buildFrames([slide]), [slide]);
   const [screen, setScreen] = useState(0);
-  const pagerClass =
-    "inline-flex size-7 items-center justify-center rounded hover:bg-black/5 disabled:opacity-30";
 
   return (
     <>
-      <main className="editor-stage flex min-h-0 flex-1 items-center justify-center">
-        <div className="editor-canvas">
+      <main className="flex min-h-0 flex-1 items-center justify-center" style={STAGE_STYLE}>
+        <div className="shadow-lg" style={CANVAS_STYLE}>
           <FrameView frame={screens[screen]} />
         </div>
       </main>
 
-      <div className="flex h-9 items-center justify-between border-t border-border bg-surface px-4 text-sm text-muted">
-        <p>
+      <div className="flex h-8 shrink-0 items-center gap-2 border-t border-border bg-surface px-2 text-xs text-muted">
+        {leading}
+        <p className="px-1">
           {position} · {t(`kinds.${slide.kind}`)}
         </p>
         {screens.length > 1 && (
-          <div className="flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-1">
             <button
               type="button"
-              className={pagerClass}
+              className={iconButton}
               aria-label={t("previousScreen")}
               disabled={screen === 0}
               onClick={() => setScreen(screen - 1)}
@@ -62,7 +69,7 @@ function Stage({ slide, position }: { slide: TemplateSlide; position: string }) 
             </span>
             <button
               type="button"
-              className={pagerClass}
+              className={iconButton}
               aria-label={t("nextScreen")}
               disabled={screen === screens.length - 1}
               onClick={() => setScreen(screen + 1)}
@@ -76,8 +83,8 @@ function Stage({ slide, position }: { slide: TemplateSlide; position: string }) 
   );
 }
 
-// The template editor: a header with the name and menus, the selected slide in the middle,
-// and every slide in a strip along the bottom.
+// The template editor: a thin header with the name and menus, the slides in a panel on the
+// left, and the selected slide on the stage.
 export function TemplateEditor({ church, template }: { church: Church; template: Template }) {
   const t = useTranslations("Editor");
   const router = useRouter();
@@ -86,13 +93,14 @@ export function TemplateEditor({ church, template }: { church: Church; template:
 
   const [name, setName] = useState(template.name);
   const [selected, setSelected] = useState(0);
+  const [panelOpen, setPanelOpen] = useState(true);
   const [presentingFrom, setPresentingFrom] = useState<number | null>(null);
 
   const slides = template.slides;
   const last = slides.length - 1;
   const churchPath = `/churches/${church.slug}`;
 
-  // Every screen of the slideshow, and the first screen of each slide for the filmstrip.
+  // Every screen of the slideshow, and the first screen of each slide for the panel.
   const frames = useMemo(() => buildFrames(slides), [slides]);
   const thumbnails = useMemo(() => slides.map((slide) => buildFrames([slide])[0]), [slides]);
 
@@ -162,6 +170,10 @@ export function TemplateEditor({ church, template }: { church: Church; template:
       commands: [
         { label: t("commands.presentFromStart"), onSelect: () => present(0), disabled: empty },
         { label: t("commands.presentFromCurrent"), onSelect: () => present(selected), disabled: empty },
+        {
+          label: panelOpen ? t("commands.hidePanel") : t("commands.showPanel"),
+          onSelect: () => setPanelOpen(!panelOpen),
+        },
       ],
     },
     {
@@ -178,50 +190,69 @@ export function TemplateEditor({ church, template }: { church: Church; template:
   const user = displayName(session.user);
   const current = slides[selected];
 
+  // Shown in the status line while the panel is closed, to bring it back.
+  const showPanel = panelOpen ? null : (
+    <button
+      type="button"
+      aria-label={t("showPanel")}
+      title={t("showPanel")}
+      className={iconButton}
+      onClick={() => setPanelOpen(true)}
+    >
+      <PanelLeftOpen aria-hidden className="size-4" />
+    </button>
+  );
+
   return (
     <div className="flex h-dvh flex-col bg-[#eef0f3]">
-      <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-2">
+      <header className="flex h-11 shrink-0 items-center gap-2 border-b border-border bg-surface px-3">
         <Link href={churchPath} aria-label={t("back", { church: church.name })} title={t("back", { church: church.name })}>
-          <BrandMark className="size-10" />
+          <BrandMark className="size-7" />
         </Link>
+        <TitleField name={name} onRename={rename} inputRef={title} />
+        <Menubar label={t("menubar")} menus={menus} />
 
-        <div className="min-w-0">
-          <TitleField name={name} onRename={rename} inputRef={title} />
-          <Menubar label={t("menubar")} menus={menus} />
-        </div>
-
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
             disabled={empty}
-            className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground hover:opacity-90 disabled:opacity-40"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-medium text-accent-foreground hover:opacity-90 disabled:opacity-40"
             onClick={() => present(selected)}
           >
-            <Play aria-hidden className="size-4" />
+            <Play aria-hidden className="size-3.5" />
             {t("slideshow")}
           </button>
           <span
             role="img"
             aria-label={t("account", { name: user })}
             title={`${user} (${session.user.email})`}
-            className="flex size-9 items-center justify-center rounded-full bg-accent font-medium text-accent-foreground"
+            className="flex size-8 items-center justify-center rounded-full bg-accent text-sm font-medium text-accent-foreground"
           >
             {user.charAt(0).toUpperCase()}
           </span>
         </div>
       </header>
 
-      {current ? (
-        <Stage
-          key={current.id}
-          slide={current}
-          position={t("position", { current: selected + 1, total: slides.length })}
-        />
-      ) : (
-        <main className="flex flex-1 items-center justify-center text-muted">{t("empty")}</main>
-      )}
-
-      <Filmstrip frames={thumbnails} selected={selected} onSelect={select} />
+      <div className="flex min-h-0 flex-1">
+        {panelOpen && (
+          <Filmstrip frames={thumbnails} selected={selected} onSelect={select} onClose={() => setPanelOpen(false)} />
+        )}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {current ? (
+            <Stage
+              key={current.id}
+              slide={current}
+              position={t("position", { current: selected + 1, total: slides.length })}
+              leading={showPanel}
+            />
+          ) : (
+            <>
+              <main className="flex flex-1 items-center justify-center text-muted">{t("empty")}</main>
+              <div className="flex h-8 shrink-0 items-center border-t border-border bg-surface px-2">{showPanel}</div>
+            </>
+          )}
+        </div>
+      </div>
 
       {presentingFrom !== null && (
         <Presenter

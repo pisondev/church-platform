@@ -71,7 +71,7 @@ test("starts on the first slide, with every slide in the filmstrip", () => {
 
   expect(stage().getByText("Selamat Datang")).toBeInTheDocument();
   expect(screen.getByText("Slide 1 of 4 · Cover")).toBeInTheDocument();
-  expect(strip().getAllByRole("button")).toHaveLength(4);
+  expect(strip().getAllByRole("button", { name: /^Slide \d+:/ })).toHaveLength(4);
   expect(strip().getByRole("button", { name: "Slide 1: Cover" })).toHaveAttribute("aria-current", "true");
 });
 
@@ -226,9 +226,54 @@ test("the slideshow shows every screen of a long reading", () => {
   expect(show.getByText("Baris 9")).toBeInTheDocument();
 });
 
+test("the slide panel closes from its own button and comes back from the status line", () => {
+  renderEditor();
+
+  fireEvent.click(screen.getByRole("button", { name: messages.Editor.hidePanel }));
+
+  expect(screen.queryByRole("navigation", { name: messages.Editor.filmstrip })).not.toBeInTheDocument();
+  expect(stage().getByText("Selamat Datang")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: messages.Editor.showPanel }));
+
+  expect(strip().getAllByRole("button", { name: /^Slide \d+:/ })).toHaveLength(4);
+  expect(screen.queryByRole("button", { name: messages.Editor.showPanel })).not.toBeInTheDocument();
+});
+
+test("the View menu hides and shows the slide panel", () => {
+  renderEditor();
+
+  chooseCommand(messages.Editor.menus.view, messages.Editor.commands.hidePanel);
+  expect(screen.queryByRole("navigation", { name: messages.Editor.filmstrip })).not.toBeInTheDocument();
+
+  chooseCommand(messages.Editor.menus.view, messages.Editor.commands.showPanel);
+  expect(screen.getByRole("navigation", { name: messages.Editor.filmstrip })).toBeInTheDocument();
+});
+
+test("slides can still be changed from the keyboard while the panel is closed", () => {
+  renderEditor();
+  fireEvent.click(screen.getByRole("button", { name: messages.Editor.hidePanel }));
+
+  press("ArrowRight");
+
+  expect(screen.getByText("Slide 2 of 4 · Section")).toBeInTheDocument();
+});
+
+test("the stage sizes the slide itself, without help from a stylesheet", () => {
+  renderEditor();
+
+  const main = screen.getByRole("main");
+  expect(main.style.containerType).toBe("size");
+  expect((main.firstElementChild as HTMLElement).style.width).toContain("100cqh");
+});
+
 test("an empty template says so and cannot be presented", () => {
   renderEditor({ ...template, slideCount: 0, slides: [] });
 
   expect(screen.getByText(messages.Editor.empty)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: messages.Editor.slideshow })).toBeDisabled();
+
+  // The panel can still be closed and brought back.
+  fireEvent.click(screen.getByRole("button", { name: messages.Editor.hidePanel }));
+  expect(screen.getByRole("button", { name: messages.Editor.showPanel })).toBeInTheDocument();
 });

@@ -140,11 +140,13 @@ A template is an ordered list of slides of five kinds: cover, section, song, scr
 
 Opening a template starts the editor, laid out like a slides application:
 
-- **Header.** The logo leads back to the church. The name is edited in place: Enter or leaving the field saves, Escape restores it. Below it are the File, View and Slide menus; on the right, the Slideshow button and the signed-in account.
-- **Stage.** The selected slide, fitted to the space available. A reading that takes several screens can be paged through.
-- **Filmstrip.** Every slide along the bottom, scrolling sideways, also with a plain mouse wheel. The selected slide stays in view.
+- **Header.** One thin row. The logo leads back to the church. The name is edited in place: Enter or leaving the field saves, Escape restores it. Next to it are the File, View and Slide menus; on the right, the Slideshow button and the signed-in account.
+- **Slide panel.** Every slide in a numbered column on the left, scrolling on its own. The selected slide stays in view. The icon at its top closes the panel, and the icon in the status line, or View > Show the slide panel, brings it back.
+- **Stage.** The selected slide, fitted to the space available. A reading that takes several screens can be paged through from the status line.
 
 Arrow keys, Page Up, Page Down, Home and End move between slides. Slideshow covers the screen, starts from the selected slide and closes with Escape.
+
+The size of the slide on the stage is set inline rather than in `globals.css`. Without a width the slide collapses to nothing, and a development server can serve an older stylesheet than the one on disk.
 
 The editor can rename a template so far. Adding, changing, moving and removing slides is not built yet, and neither are weekly presentations. The first template, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`.
 

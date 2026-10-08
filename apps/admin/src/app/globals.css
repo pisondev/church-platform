@@ -184,20 +184,3 @@ body {
 .slide-stage:fullscreen > .slide-frame {
   width: min(100vw, calc(100vh * 16 / 9));
 }
-
-/* Editor: the slide takes the space between the header and the filmstrip, keeping 16:9. */
-.editor-stage {
-  container-type: size;
-}
-
-.editor-canvas {
-  width: min(calc(100cqw - 3rem), calc((100cqh - 3rem) * 16 / 9));
-  box-shadow:
-    0 1px 3px rgb(0 0 0 / 0.14),
-    0 8px 24px rgb(0 0 0 / 0.08);
-}
-
-/* Slideshow: as large as the screen allows. */
-.present-frame {
-  width: min(100vw, calc(100vh * 16 / 9));
-}

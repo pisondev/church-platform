@@ -41,14 +41,14 @@ export function TitleField({
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <input
         ref={inputRef}
         aria-label={t("titleLabel")}
         value={draft}
         size={Math.max(draft.length, 6)}
         maxLength={120}
-        className="max-w-[50vw] rounded border border-transparent bg-transparent px-1.5 py-0.5 text-lg font-medium hover:border-border focus:border-accent focus:outline-none"
+        className="max-w-[40vw] rounded border border-transparent bg-transparent px-1.5 py-0.5 text-sm font-semibold hover:border-border focus:border-accent focus:outline-none"
         onChange={(event) => {
           setDraft(event.target.value);
           setStatus({ kind: "idle" });
@@ -64,17 +64,17 @@ export function TitleField({
         }}
       />
       {status.kind === "saving" && (
-        <span role="status" className="text-sm text-muted">
+        <span role="status" className="text-xs text-muted">
           {t("saving")}
         </span>
       )}
       {status.kind === "saved" && (
-        <span role="status" className="text-sm text-muted">
+        <span role="status" className="text-xs text-muted">
           {t("saved")}
         </span>
       )}
       {status.kind === "error" && (
-        <span role="alert" className="text-sm text-red-800">
+        <span role="alert" className="text-xs text-red-800">
           {t(`errors.${status.reason === "name_taken" || status.reason === "invalid_name" ? status.reason : "failed"}`)}
         </span>
       )}
