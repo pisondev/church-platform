@@ -138,3 +138,4 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 
 - [Changelog](CHANGELOG.md)
 - [Deployment checklist](docs/deployment.md)
+- [Google sign-in setup](docs/google-oauth-setup.md)

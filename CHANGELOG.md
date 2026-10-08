@@ -18,6 +18,7 @@ All notable changes are recorded here. The format follows [Keep a Changelog](htt
 - Public site and admin panel as separate Next.js apps with Tailwind CSS, Lucide icons, typed English messages through next-intl, and Vitest tests.
 - GitHub Actions workflow that checks commit messages, the API and both frontends.
 - About, Contact, Privacy Policy and Terms of Service pages on the public site, with a shared header and footer.
+- Google sign-in setup guide and the matching `.env.example` entries.
 
 ### Changed
 
