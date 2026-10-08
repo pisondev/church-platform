@@ -1,0 +1,39 @@
+#!/bin/sh
+# Rejects commit messages that attribute the work to an AI tool.
+# Usage: commit-msg <path-to-message-file>
+
+msg_file=$1
+if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
+  echo "commit-msg: message file not found" >&2
+  exit 1
+fi
+
+edge='[^[:alnum:]_]'
+tools='claude|anthropic|copilot|chatgpt|openai|gpt-?[0-9]|gemini|cursor|codex|aider|devin ai|windsurf|codeium|tabnine|codewhisperer|amazon q|llm|ai'
+# "cursor" alone is a common word, so prose only matches it as a product name.
+prose_tools='claude|anthropic|copilot|chatgpt|openai|gpt-?[0-9]|gemini|cursor (ai|agent|composer)|codex|aider|devin ai|windsurf|codeium|tabnine|codewhisperer|amazon q|llm|ai'
+
+trailer="^[[:space:]]*(co-authored-by|co-developed-by|signed-off-by|assisted-by|generated-by|authored-by|reviewed-by)[[:space:]]*:.*(^|$edge)($tools)($edge|\$)"
+prose="(generated|written|created|authored|produced|made|assisted|co-?authored)[[:space:]]+(with|by|using|via)[[:space:]]+(the[[:space:]]+help[[:space:]]+of[[:space:]]+)?(an?[[:space:]]+)?\\[?($prose_tools)($edge|\$)"
+marker='noreply@anthropic\.com|cursoragent@cursor\.com|copilot@users\.noreply\.github\.com|claude\.(com|ai)/'
+
+# With `git commit -v` the diff sits below the scissors line; it is not part of the message.
+message=$(sed '/^# -\{24\} >8 -\{24\}$/,$d' "$msg_file")
+
+offending=$(
+  {
+    printf '%s\n' "$message" | grep -iE -e "$trailer" -e "$prose" -e "$marker"
+    printf '%s\n' "$message" | grep -F '🤖'
+  } | sort -u
+)
+
+if [ -n "$offending" ]; then
+  {
+    echo "commit-msg: AI attribution is not allowed in commit messages."
+    printf '%s\n' "$offending" | sed 's/^/  > /'
+    echo "Remove the lines above and commit again."
+  } >&2
+  exit 1
+fi
+
+exit 0

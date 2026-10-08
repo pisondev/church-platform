@@ -1,0 +1,12 @@
+# Changelog
+
+All notable changes are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- Monorepo skeleton with a pnpm workspace.
+- `commit-msg` hook that rejects AI attribution, with tests and a range checker for CI.
+- `pre-push` hook that runs the unit tests.
+- `.env.example` listing the runtime configuration.

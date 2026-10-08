@@ -1,0 +1,23 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Go
+/apps/api/bin/
+*.test
+*.out
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

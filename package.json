@@ -1,0 +1,13 @@
+{
+  "name": "church-platform",
+  "private": true,
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "prepare": "node scripts/install-hooks.mjs",
+    "test": "pnpm run test:hooks",
+    "test:hooks": "node --test scripts/commit-msg-hook.test.mjs"
+  }
+}
