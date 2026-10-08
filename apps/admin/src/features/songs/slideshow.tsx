@@ -2,10 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Maximize } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState } from "react";
-
-import { SlideView } from "./slide-view";
-import type { SongSlide } from "./types";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 const NEXT_KEYS = new Set(["ArrowRight", "ArrowDown", "PageDown", " "]);
 const PREVIOUS_KEYS = new Set(["ArrowLeft", "ArrowUp", "PageUp"]);
@@ -18,7 +15,8 @@ function ownsKey(target: EventTarget | null, key: string): boolean {
 }
 
 // Shows one slide at a time, with keyboard, click and full-screen controls.
-export function Slideshow({ slides }: { slides: SongSlide[] }) {
+// Each entry of `slides` is a rendered slide frame.
+export function Slideshow({ slides }: { slides: ReactNode[] }) {
   const t = useTranslations("Slideshow");
   const stage = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -58,7 +56,7 @@ export function Slideshow({ slides }: { slides: SongSlide[] }) {
         className="slide-stage cursor-pointer overflow-hidden rounded-lg border border-border"
         onClick={() => go(current + 1)}
       >
-        <SlideView slide={slides[current]} />
+        {slides[current]}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -104,7 +102,7 @@ export function Slideshow({ slides }: { slides: SongSlide[] }) {
               className="block w-full overflow-hidden rounded-md border border-border aria-[current]:ring-2 aria-[current]:ring-accent"
               onClick={() => go(position)}
             >
-              <SlideView slide={slide} />
+              {slide}
             </button>
           </li>
         ))}

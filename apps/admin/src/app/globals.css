@@ -170,6 +170,8 @@ body {
   overflow: hidden;
   background: #fff;
   color: #0a0a0a;
+  /* A thumbnail sits inside a button, which would otherwise center the text. */
+  text-align: left;
 }
 
 .slide-stage:fullscreen {

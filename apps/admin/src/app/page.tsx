@@ -31,15 +31,17 @@ export default function HomePage() {
       ) : (
         <ul className="mt-4 grid gap-4 sm:grid-cols-2">
           {session.churches.map((church) => (
-            <li
-              key={church.id}
-              className="flex items-center gap-3 rounded-lg border border-border bg-surface p-5"
-            >
-              <Church aria-hidden className="size-5 shrink-0 text-accent" />
-              <span>
-                <span className="block font-medium">{church.name}</span>
-                <span className="block text-sm text-muted">{church.slug}</span>
-              </span>
+            <li key={church.id}>
+              <Link
+                href={`/churches/${church.slug}`}
+                className="flex items-center gap-3 rounded-lg border border-border bg-surface p-5 hover:border-accent"
+              >
+                <Church aria-hidden className="size-5 shrink-0 text-accent" />
+                <span>
+                  <span className="block font-medium">{church.name}</span>
+                  <span className="block text-sm text-muted">{church.slug}</span>
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

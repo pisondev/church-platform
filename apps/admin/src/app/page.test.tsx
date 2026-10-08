@@ -20,7 +20,7 @@ test("falls back to the email when the profile has no name", () => {
 test("lists the churches the user manages", () => {
   renderWithSession(<HomePage />);
 
-  expect(screen.getByText("GKJ Sentolo")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /GKJ Sentolo/ })).toHaveAttribute("href", "/churches/gkj-sentolo");
   expect(screen.queryByText(messages.Home.noChurches)).not.toBeInTheDocument();
 });
 

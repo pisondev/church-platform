@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
+import { SlideView } from "./slide-view";
 import { buildSongSlides } from "./slides";
 import { Slideshow } from "./slideshow";
 import type { Song } from "./types";
@@ -11,7 +12,10 @@ import type { Song } from "./types";
 export function SongPresenter({ song }: { song: Song }) {
   const t = useTranslations("Songs");
   const [selected, setSelected] = useState(() => song.verses.map((verse) => verse.label));
-  const slides = useMemo(() => buildSongSlides(song, selected), [song, selected]);
+  const slides = useMemo(
+    () => buildSongSlides(song, selected).map((slide, index) => <SlideView key={index} slide={slide} />),
+    [song, selected],
+  );
 
   const toggle = (label: string) =>
     setSelected((labels) =>

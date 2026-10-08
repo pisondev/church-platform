@@ -12,7 +12,7 @@ The first feature in scope is Presentation: reusable liturgy templates and the w
 | --- | --- |
 | `apps/api` | HTTP API (Go, Gin, PostgreSQL) |
 | `apps/web` | Public site: landing, About, Contact, Privacy Policy, Terms of Service and the login page (Next.js, Tailwind CSS, Lucide) |
-| `apps/admin` | Admin panel for Super Admins and Church Admins, with the song library and slide preview (Next.js, Tailwind CSS, Lucide) |
+| `apps/admin` | Admin panel for Super Admins and Church Admins: churches, templates, the song library and slide previews (Next.js, Tailwind CSS, Lucide) |
 | `infra` | Local infrastructure files used by Docker Compose |
 | `.githooks` | Versioned git hooks |
 | `scripts` | Repository tooling and its tests |
@@ -131,13 +131,21 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 - **Theme.** Light only, and slides are dark text on white, because weak projectors wash out dark screens. Colors are CSS variables in each app's `globals.css`, so a dark theme can be added later by overriding them.
 - **Tests.** Vitest with Testing Library. `renderWithMessages` in `src/test-utils.tsx` renders a component with the English messages.
 
+## Churches and templates
+
+The admin home lists the churches the signed-in user manages. A church page lists its templates, and a template page previews every slide in the same slideshow the songs use.
+
+A template is an ordered list of slides of five kinds: cover, section, song, scripture and responsive reading. Song and scripture slides are empty slots, filled when a presentation is made. A responsive reading that does not fit on one screen is spread over numbered frames, and each role has its own color.
+
+Templates are read-only for now: the first one, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`. Editing and weekly presentations are not built yet.
+
 ## Songs and slides
 
 The admin panel has a song library at `/songs`. Each song is stored as text and drawn by the system as cipher notation with aligned lyrics; see [Song notation format](docs/notation.md).
 
 A song page lets you choose verses and previews the slides: a title slide, then two phrases per slide at most. The slideshow moves with the arrow keys, Page Up, Page Down, Space, Home, End or a click, and Present opens it full screen.
 
-Two songs are built in for now, KJ 40 and PKJ 192. Templates and stored presentations are not built yet.
+Two songs are built in for now, KJ 40 and PKJ 192.
 
 ## Git hooks
 

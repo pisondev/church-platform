@@ -41,5 +41,25 @@
     "position": "Slide {current} of {total}",
     "goTo": "Go to slide {number}",
     "hint": "Arrow keys, Space or a click move between slides. Esc leaves full screen."
+  },
+  "Resource": {
+    "loading": "Loading…",
+    "notFound": "This page does not exist, or your account has no access to it.",
+    "error": "The server could not be reached. Try again in a moment."
+  },
+  "Church": {
+    "back": "Home",
+    "templatesTitle": "Templates",
+    "templatesLead": "A template holds the order of worship. Weekly presentations start from one.",
+    "noTemplates": "This church has no templates yet.",
+    "templateMeta": "{count, plural, one {# slide} other {# slides}} · {ratio}"
+  },
+  "Templates": {
+    "meta": "{count, plural, one {# slide} other {# slides}} · {ratio}",
+    "slots": {
+      "song": "Song",
+      "scripture": "Scripture",
+      "hint": "Chosen when a presentation is made from this template"
+    }
   }
 }
