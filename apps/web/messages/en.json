@@ -1,12 +1,16 @@
 {
   "Metadata": {
-    "description": "Church management platform with presentation tools for weekly worship."
+    "description": "{name} helps churches prepare weekly worship presentations from reusable liturgy templates."
   },
-  "Header": {
+  "Nav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
     "signIn": "Sign in"
   },
   "Home": {
-    "eyebrow": "Church management platform",
     "title": "Prepare Sunday worship slides in minutes",
     "lead": "Build each week's presentation from a reusable liturgy template instead of starting from a blank file.",
     "features": {
@@ -23,6 +27,22 @@
         "body": "Run the slideshow full screen or download it as a PDF."
       }
     }
+  },
+  "About": {
+    "title": "About {name}",
+    "lead": "{name} is a management platform for churches. It starts with one job: preparing the slides for weekly worship.",
+    "whyTitle": "Why it exists",
+    "why": "Most churches rebuild the same presentation every week by copying last Sunday's file. {name} keeps the order of worship as a template, so the weekly work is only what changes: the songs, the readings and the sermon theme.",
+    "whoTitle": "Who runs it",
+    "who": "{name} is built and operated by {operator}."
+  },
+  "Contact": {
+    "title": "Contact",
+    "lead": "Questions, feedback, or a request to delete your data: send an email and you will get a reply.",
+    "emailLabel": "Email"
+  },
+  "Legal": {
+    "effective": "Effective {date}"
   },
   "Footer": {
     "rights": "All rights reserved."

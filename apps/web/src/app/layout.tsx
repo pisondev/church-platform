@@ -4,6 +4,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/config/site";
 
 import "./globals.css";
@@ -23,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: { default: siteConfig.title, template: `%s | ${siteConfig.title}` },
-    description: t("description"),
+    description: t("description", { name: siteConfig.name }),
   };
 }
 
@@ -36,7 +38,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

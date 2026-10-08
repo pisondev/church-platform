@@ -1,5 +1,5 @@
-// "Church Platform" is a working name. Change the product name here only.
-const name = "Church Platform";
+// Product identity. Change the name here only.
+const name = "EccleService";
 
 export const siteConfig = {
   name,

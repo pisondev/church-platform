@@ -1,6 +1,8 @@
-# Church Platform
+# EccleService
 
-Church management platform, built as a multi-tenant service. "Church Platform" is a working name.
+*a service for your Ecclesia (a.k.a Church)*
+
+Church management platform, built as a multi-tenant service. The repository keeps its original name, `church-platform`.
 
 The first feature in scope is Presentation: reusable liturgy templates and the weekly slides made from them.
 
@@ -9,7 +11,7 @@ The first feature in scope is Presentation: reusable liturgy templates and the w
 | Path | Purpose |
 | --- | --- |
 | `apps/api` | HTTP API (Go, Gin, PostgreSQL) |
-| `apps/web` | Public site (Next.js, Tailwind CSS, Lucide) |
+| `apps/web` | Public site: landing, About, Contact, Privacy Policy and Terms of Service (Next.js, Tailwind CSS, Lucide) |
 | `apps/admin` | Admin panel for Super Admins and Church Admins (Next.js, Tailwind CSS, Lucide) |
 | `infra` | Local infrastructure files used by Docker Compose |
 | `.githooks` | Versioned git hooks |
@@ -101,7 +103,8 @@ Errors use one envelope: `{"error": {"code": "not_found", "message": "resource n
 
 Both apps use the Next.js App Router with Cache Components enabled, so pages are prerendered unless they opt into request-time data.
 
-- **Product name.** It lives in `src/config/site.ts` of each app. Change it there only.
+- **Product identity.** The name, tagline, operator and contact email live in `src/config/site.ts` of each app. Change them there only.
+- **Legal text.** The Privacy Policy and Terms of Service are English only and live in `apps/web/src/content`. They are drafts until reviewed.
 - **Copy.** UI text lives in `messages/en.json` and is read through [next-intl](https://next-intl.dev). Keys are type-checked. To add a language, add its code to `src/i18n/config.ts`, add `messages/<code>.json`, and resolve the locale in `src/i18n/request.ts`.
 - **Tests.** Vitest with Testing Library. `renderWithMessages` in `src/test-utils.tsx` renders a component with the English messages.
 

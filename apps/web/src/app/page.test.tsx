@@ -6,11 +6,11 @@ import { messages, renderWithMessages } from "@/test-utils";
 
 import HomePage from "./page";
 
-test("shows the headline and the product name", () => {
+test("shows the headline and the tagline", () => {
   renderWithMessages(<HomePage />);
 
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(messages.Home.title);
-  expect(screen.getByRole("banner")).toHaveTextContent(siteConfig.name);
+  expect(screen.getByText(siteConfig.tagline)).toBeInTheDocument();
 });
 
 test("lists every feature", () => {
@@ -18,13 +18,4 @@ test("lists every feature", () => {
 
   const headings = screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent);
   expect(headings).toEqual(Object.values(messages.Home.features).map((feature) => feature.title));
-});
-
-test("links sign in to the admin app", () => {
-  renderWithMessages(<HomePage />);
-
-  expect(screen.getByRole("link", { name: messages.Header.signIn })).toHaveAttribute(
-    "href",
-    siteConfig.adminUrl,
-  );
 });
