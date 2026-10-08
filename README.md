@@ -150,15 +150,24 @@ The size of the slide on the stage is set inline rather than in `globals.css`. W
 
 ### Cover bumper
 
-The cover of a church that has a logo is a bumper: a short motion piece that repeats for as long as the slide is shown. One round takes 8 seconds:
+The cover of a church that has a logo is a bumper: a short motion piece that repeats for as long as the slide is shown. One round takes 14 seconds:
 
-1. The logo comes up from below the frame, turning around its vertical axis. It leaves fast and slows down.
-2. It passes the center by a little, then sinks back onto it and rests there. A soft shadow follows it.
-3. It fades out, and the next round starts from an empty frame.
+1. The logo comes up from below the frame, flipping three times around its vertical axis. It leaves fast, slows down, passes the center by a little and sinks back onto it. A soft shadow follows it.
+2. It glides to the left, shrinking a little, and uncovers the title, which comes out from behind it.
+3. The date line appears under the title, moving in from the left. It is smaller than the title by the golden ratio.
+4. When the cover has a footer, everything moves up and the footer fades in below, as a notice on frosted glass.
+5. Everything rests, then fades out, and the next round starts from an empty frame.
 
-The bumper plays on the stage and in the slideshow. The slide panel shows it at rest. The cover text is not shown while the bumper is being built; a cover of a church without a logo still shows its title, subtitle and footer.
+The text comes from the cover slide:
 
-The motion is in `apps/admin/src/features/templates/bumper.tsx`. It runs on the Web Animations API, so it does not depend on a stylesheet, and it plays even when the system asks for reduced motion, because it is content like a video. Logos ship with the app for now, in `apps/admin/public/logos`, listed by church slug in `church-logo.ts`. Churches cannot upload their own yet.
+- **Title.** `{n}` in it stands for which Sunday of the month the service falls on: "Ibadah Minggu ke-{n}" reads "Ibadah Minggu ke-2" on the second Sunday.
+- **Date line.** A template has no date of its own, so the cover is dated for the coming Sunday, or today on a Sunday, in Indonesian: "Minggu, 11 Oktober 2026". Presentations will bring their own date.
+- **Notice.** The footer of the cover. Without one, nothing moves up.
+- The subtitle has no place in the bumper yet.
+
+The bumper plays on the stage and in the slideshow. The slide panel shows it at rest. A cover of a church without a logo shows its title, subtitle and footer as plain text.
+
+The motion is in `apps/admin/src/features/templates/bumper.tsx`, with every timing and size at the top of the file, and the date in `service-date.ts`. It runs on the Web Animations API, so it does not depend on a stylesheet, and it plays even when the system asks for reduced motion, because it is content like a video. Logos ship with the app for now, in `apps/admin/public/logos`, listed by church slug in `church-logo.ts`. Churches cannot upload their own yet.
 
 The editor can rename a template so far. Adding, changing, moving and removing slides is not built yet, and neither are weekly presentations. The first template, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`.
 

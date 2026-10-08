@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { expect, test } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import { messages, renderWithMessages } from "@/test-utils";
 
@@ -7,35 +7,48 @@ import { FrameView } from "./frame-view";
 import { buildFrames } from "./frames";
 import type { Church, TemplateSlide } from "./types";
 
+// Friday 9 October 2026: the coming Sunday is the 11th, the second of the month.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date(2026, 9, 9, 10));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+const cover: TemplateSlide = {
+  id: "1",
+  position: 1,
+  kind: "cover",
+  content: {
+    title: "Ibadah Minggu ke-{n}",
+    subtitle: "Selamat Datang",
+    footer: "Handphone mohon dimatikan",
+  },
+};
+
 function renderSlide(slide: TemplateSlide, frame = 0, church?: Pick<Church, "name" | "slug">) {
   return renderWithMessages(<FrameView frame={buildFrames([slide])[frame]} church={church} />);
 }
 
-test("the cover of a church with a logo is a bumper: the logo, without the text", () => {
-  renderSlide({ id: "1", position: 1, kind: "cover", content: { title: "Selamat Datang" } }, 0, {
-    name: "GKJ Sentolo",
-    slug: "gkj-sentolo",
-  });
+test("the cover of a church with a logo is a bumper: logo, numbered title, date and notice", () => {
+  renderSlide(cover, 0, { name: "GKJ Sentolo", slug: "gkj-sentolo" });
 
   expect(screen.getByRole("img", { name: "GKJ Sentolo logo" })).toHaveAttribute("src", "/logos/gkj-sentolo.webp");
+  expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();
+  expect(screen.getByText("Minggu, 11 Oktober 2026")).toBeInTheDocument();
+  expect(screen.getByText("Handphone mohon dimatikan")).toBeInTheDocument();
+  // The subtitle has no place in the bumper yet.
   expect(screen.queryByText("Selamat Datang")).not.toBeInTheDocument();
 });
 
-test("the cover of a church without a logo shows its title, subtitle and footer", () => {
-  renderSlide(
-    {
-      id: "1",
-      position: 1,
-      kind: "cover",
-      content: { title: "Selamat Datang", subtitle: "Ibadah Minggu", footer: "Handphone mohon dimatikan" },
-    },
-    0,
-    { name: "GKJ Contoh", slug: "gkj-contoh" },
-  );
+test("the cover of a church without a logo shows its numbered title, subtitle and footer", () => {
+  renderSlide(cover, 0, { name: "GKJ Contoh", slug: "gkj-contoh" });
 
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();
   expect(screen.getByText("Selamat Datang")).toBeInTheDocument();
-  expect(screen.getByText("Ibadah Minggu")).toBeInTheDocument();
   expect(screen.getByText("Handphone mohon dimatikan")).toBeInTheDocument();
 });
 

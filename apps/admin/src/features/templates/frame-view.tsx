@@ -1,9 +1,13 @@
+"use client";
+
 import { BookOpen, Music } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { Bumper } from "./bumper";
 import { churchLogo } from "./church-logo";
-import type { Church, Frame, ReadingLine } from "./types";
+import { coverTitle, serviceDateLine, upcomingSunday } from "./service-date";
+import type { Church, Frame, ReadingLine, TemplateSlide } from "./types";
 
 // Slide text is worship content in its own language and is not translated. Only the
 // labels of empty slots are interface text. Sizes use cqw, a share of the slide width.
@@ -86,25 +90,46 @@ function Reading({ title, lines, page, pages }: { title?: string; lines: Reading
   );
 }
 
-// Draws one frame of a template. The cover of a church that has a logo is a bumper, and
-// its text is not shown for now; any other cover shows its text. Motion plays only when
-// the frame is live: thumbnails stay still.
-export function FrameView({
-  frame,
+type FrameChurch = Pick<Church, "name" | "slug">;
+
+// The cover of a church that has a logo is a bumper: the logo, the title, the date and
+// the footer as a notice. Any other cover shows its title, subtitle and footer.
+function CoverFrame({
+  content,
   church,
-  live = false,
+  live,
 }: {
-  frame: Frame;
-  church?: Pick<Church, "name" | "slug">;
-  live?: boolean;
+  content: Extract<TemplateSlide, { kind: "cover" }>["content"];
+  church?: FrameChurch;
+  live: boolean;
 }) {
-  const { slide } = frame;
+  // A template has no date yet, so the cover is dated for the coming Sunday.
+  const [sunday] = useState(() => upcomingSunday(new Date()));
+  const title = content.title && coverTitle(content.title, sunday);
   const logo = church && churchLogo(church.slug);
+
+  if (!logo) return <Cover {...content} title={title} />;
+
+  return (
+    <Bumper
+      logo={logo}
+      church={church.name}
+      title={title}
+      date={serviceDateLine(sunday)}
+      notice={content.footer}
+      live={live}
+    />
+  );
+}
+
+// Draws one frame of a template. Motion plays only when the frame is live: thumbnails
+// stay still.
+export function FrameView({ frame, church, live = false }: { frame: Frame; church?: FrameChurch; live?: boolean }) {
+  const { slide } = frame;
 
   return (
     <div className="slide-frame">
-      {slide.kind === "cover" &&
-        (logo ? <Bumper logo={logo} church={church.name} live={live} /> : <Cover {...slide.content} />)}
+      {slide.kind === "cover" && <CoverFrame content={slide.content} church={church} live={live} />}
       {slide.kind === "section" && <Heading {...slide.content} />}
       {(slide.kind === "song" || slide.kind === "scripture") && <Slot kind={slide.kind} />}
       {slide.kind === "responsive_reading" && (

@@ -275,14 +275,16 @@ test("the cover of a church with a logo plays on the stage and stands still in t
 
   try {
     renderEditor(template, churchWithLogo);
-    const onStage = stage().getByRole("img", { name: "GKJ Sentolo logo" });
+    // By its alt text: a live bumper is hidden until its logo has loaded.
+    const onStage = stage().getByAltText("GKJ Sentolo logo");
     const inPanel = strip().getByRole("img", { name: "GKJ Sentolo logo" });
     fireEvent.load(inPanel);
     fireEvent.load(onStage);
 
     expect(animate).toHaveBeenCalled();
     expect(animate.mock.contexts.every((element) => screen.getByRole("main").contains(element as Node))).toBe(true);
-    expect(stage().queryByText("Selamat Datang")).not.toBeInTheDocument();
+    // The title is part of the bumper.
+    expect(stage().getByText("Selamat Datang")).toBeInTheDocument();
   } finally {
     delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
   }
@@ -296,7 +298,7 @@ test("the slideshow plays the cover of a church with a logo", () => {
     renderEditor(template, churchWithLogo);
     fireEvent.click(screen.getByRole("button", { name: messages.Editor.slideshow }));
     const dialog = screen.getByRole("dialog", { name: messages.Editor.presenting });
-    fireEvent.load(within(dialog).getByRole("img", { name: "GKJ Sentolo logo" }));
+    fireEvent.load(within(dialog).getByAltText("GKJ Sentolo logo"));
 
     expect(animate.mock.contexts.some((element) => dialog.contains(element as Node))).toBe(true);
   } finally {

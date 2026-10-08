@@ -56,8 +56,8 @@ func together(texts ...string) []readingLine {
 func liturgiUmum() []seedSlide {
 	return []seedSlide{
 		{Kind: "cover", Content: heading{
-			Title:    "Selamat Datang di Gereja Kristen Jawa Sentolo",
-			Subtitle: "Ibadah Minggu",
+			Title:    "Ibadah Minggu ke-{n}",
+			Subtitle: "Selamat Datang di Gereja Kristen Jawa Sentolo",
 			Footer:   "Handphone mohon dimatikan atau silent",
 		}},
 		section("Persiapan Ibadah", "Jemaat mempersiapkan diri memasuki ibadah. Majelis mempersiapkan di ruang konsistori."),
