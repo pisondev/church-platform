@@ -5,12 +5,17 @@ import (
 	"log/slog"
 	"net/http"
 	"regexp"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/pisondev/church-platform/apps/api/internal/auth"
 	"github.com/pisondev/church-platform/apps/api/internal/httpx"
 )
+
+// maxNameLength is the longest template name, in characters.
+const maxNameLength = 120
 
 var uuidPattern = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
@@ -35,6 +40,7 @@ func (h *Handler) Register(api gin.IRouter) {
 	church.GET("", h.church)
 	church.GET("/templates", h.list)
 	church.GET("/templates/:id", h.get)
+	church.PATCH("/templates/:id", h.rename)
 }
 
 // resolveChurch loads the church in the path, or answers 404 when the user may not see it.
@@ -103,6 +109,44 @@ func (h *Handler) get(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"church": church, "template": template})
+}
+
+// rename changes the name of a template. Body: {"name": "..."}.
+func (h *Handler) rename(c *gin.Context) {
+	church, ok := h.resolveChurch(c)
+	if !ok {
+		return
+	}
+	id := c.Param("id")
+	if !uuidPattern.MatchString(id) {
+		httpx.Error(c, http.StatusNotFound, "not_found", "template not found")
+		return
+	}
+
+	var body struct {
+		Name string `json:"name"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		httpx.Error(c, http.StatusBadRequest, "invalid_body", "the request body must be JSON with a name")
+		return
+	}
+	name := strings.TrimSpace(body.Name)
+	if name == "" || utf8.RuneCountInString(name) > maxNameLength {
+		httpx.Error(c, http.StatusBadRequest, "invalid_name", "the name must have 1 to 120 characters")
+		return
+	}
+
+	summary, err := h.store.Rename(c.Request.Context(), church.ID, id, name)
+	switch {
+	case errors.Is(err, ErrNotFound):
+		httpx.Error(c, http.StatusNotFound, "not_found", "template not found")
+	case errors.Is(err, ErrNameTaken):
+		httpx.Error(c, http.StatusConflict, "name_taken", "another template already has this name")
+	case err != nil:
+		h.fail(c, "rename template", err)
+	default:
+		c.JSON(http.StatusOK, gin.H{"template": summary})
+	}
 }
 
 func (h *Handler) fail(c *gin.Context, what string, err error) {

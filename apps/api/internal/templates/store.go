@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/pisondev/church-platform/apps/api/internal/auth"
@@ -16,6 +17,9 @@ import (
 
 // ErrNotFound covers both "does not exist" and "not yours": callers must not tell them apart.
 var ErrNotFound = errors.New("templates: not found")
+
+// ErrNameTaken is returned when another live template of the church has the name.
+var ErrNameTaken = errors.New("templates: name already used")
 
 // Church is a tenant as shown to someone who manages it.
 type Church struct {
@@ -53,6 +57,7 @@ type Store interface {
 	ChurchForUser(ctx context.Context, slug string, user auth.User) (Church, error)
 	List(ctx context.Context, churchID string) ([]Summary, error)
 	Get(ctx context.Context, churchID, templateID string) (Template, error)
+	Rename(ctx context.Context, churchID, templateID, name string) (Summary, error)
 }
 
 // PostgresStore implements Store.
@@ -140,4 +145,28 @@ func (s *PostgresStore) Get(ctx context.Context, churchID, templateID string) (T
 		template.Slides = []Slide{}
 	}
 	return template, nil
+}
+
+const uniqueViolation = "23505"
+
+// Rename changes the name of a template of the church.
+func (s *PostgresStore) Rename(ctx context.Context, churchID, templateID, name string) (Summary, error) {
+	var summary Summary
+	err := s.pool.QueryRow(ctx, `
+		UPDATE templates t
+		SET name = $3, updated_at = now()
+		WHERE t.id = $1 AND t.church_id = $2 AND t.deleted_at IS NULL
+		RETURNING `+summaryColumns, templateID, churchID, name).
+		Scan(&summary.ID, &summary.Name, &summary.AspectRatio, &summary.SlideCount, &summary.UpdatedAt)
+
+	var pgErr *pgconn.PgError
+	switch {
+	case errors.Is(err, pgx.ErrNoRows):
+		return Summary{}, ErrNotFound
+	case errors.As(err, &pgErr) && pgErr.Code == uniqueViolation:
+		return Summary{}, ErrNameTaken
+	case err != nil:
+		return Summary{}, fmt.Errorf("rename template: %w", err)
+	}
+	return summary, nil
 }

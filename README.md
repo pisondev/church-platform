@@ -111,6 +111,7 @@ Database tests need `TEST_DATABASE_URL`. Each test runs in its own schema and dr
 | `GET /api/v1/churches/:slug` | A church the user manages |
 | `GET /api/v1/churches/:slug/templates` | Its templates, with slide counts |
 | `GET /api/v1/churches/:slug/templates/:id` | One template with its slides in order |
+| `PATCH /api/v1/churches/:slug/templates/:id` | Renames a template. Body `{"name": "..."}`, 1 to 120 characters; 409 when the church already has that name |
 
 Sign-in is Google only and limited to emails that already exist in `users`: Super Admins come from `SUPER_ADMIN_EMAILS` through `pnpm db:seed`. The session is an opaque token in an httpOnly, SameSite=Lax cookie that lasts 7 days. A failed sign-in redirects to `WEB_URL/login?error=<reason>`.
 

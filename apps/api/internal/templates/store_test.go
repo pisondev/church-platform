@@ -151,3 +151,34 @@ func TestGetStaysInsideTheChurch(t *testing.T) {
 		t.Errorf("deleted template: err = %v, want ErrNotFound", err)
 	}
 }
+
+func TestRename(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	list, _ := f.store.List(ctx, f.alpha) // Liturgi Paskah, Liturgi Umum
+	paskah, umum := list[0], list[1]
+
+	renamed, err := f.store.Rename(ctx, f.alpha, umum.ID, "Liturgi Minggu")
+	if err != nil {
+		t.Fatalf("Rename: %v", err)
+	}
+	if renamed.Name != "Liturgi Minggu" || renamed.ID != umum.ID || renamed.SlideCount != 2 {
+		t.Errorf("renamed = %+v", renamed)
+	}
+
+	if _, err := f.store.Rename(ctx, f.alpha, umum.ID, paskah.Name); !errors.Is(err, templates.ErrNameTaken) {
+		t.Errorf("duplicate name: err = %v, want ErrNameTaken", err)
+	}
+	// The name of a deleted template is free again.
+	if _, err := f.store.Rename(ctx, f.alpha, umum.ID, "Removed"); err != nil {
+		t.Errorf("name of a deleted template: %v", err)
+	}
+
+	var beta string
+	if err := f.pool.QueryRow(ctx, "SELECT id::text FROM churches WHERE slug = $1", "beta").Scan(&beta); err != nil {
+		t.Fatalf("beta id: %v", err)
+	}
+	if _, err := f.store.Rename(ctx, beta, umum.ID, "Stolen"); !errors.Is(err, templates.ErrNotFound) {
+		t.Errorf("template of another church: err = %v, want ErrNotFound", err)
+	}
+}

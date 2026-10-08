@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -55,6 +56,16 @@ func (s fakeStore) Get(_ context.Context, churchID, id string) (Template, error)
 			{ID: "s2", Position: 2, Kind: "song", Content: json.RawMessage(`{}`)},
 		},
 	}, nil
+}
+
+func (s fakeStore) Rename(_ context.Context, churchID, id, name string) (Summary, error) {
+	switch {
+	case id != templateID:
+		return Summary{}, ErrNotFound
+	case name == "Liturgi Paskah":
+		return Summary{}, ErrNameTaken
+	}
+	return Summary{ID: templateID, Name: name, AspectRatio: "16:9", SlideCount: 2}, nil
 }
 
 // signedIn stands in for the session middleware.
@@ -173,5 +184,64 @@ func TestStoreFailureIsAnInternalError(t *testing.T) {
 
 	if rec := get(router, "/api/v1/churches/gkj-sentolo"); rec.Code != http.StatusInternalServerError {
 		t.Errorf("status = %d, want 500", rec.Code)
+	}
+}
+
+func patch(router http.Handler, path, body string) *httptest.ResponseRecorder {
+	req := httptest.NewRequest(http.MethodPatch, path, strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	return rec
+}
+
+func TestRenameTemplate(t *testing.T) {
+	router := newRouter(fakeStore{}, signedIn)
+	path := "/api/v1/churches/gkj-sentolo/templates/" + templateID
+
+	rec := patch(router, path, `{"name": "  Liturgi Natal  "}`)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, body = %s", rec.Code, rec.Body.String())
+	}
+	var body struct {
+		Template Summary `json:"template"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil || body.Template.Name != "Liturgi Natal" {
+		t.Errorf("template = %+v (err = %v), want the trimmed name", body.Template, err)
+	}
+}
+
+func TestRenameTemplateRejections(t *testing.T) {
+	router := newRouter(fakeStore{}, signedIn)
+	path := "/api/v1/churches/gkj-sentolo/templates/" + templateID
+
+	tests := []struct {
+		name     string
+		path     string
+		body     string
+		wantCode int
+		wantErr  string
+	}{
+		{"empty name", path, `{"name": "   "}`, http.StatusBadRequest, "invalid_name"},
+		{"name too long", path, `{"name": "` + strings.Repeat("a", 121) + `"}`, http.StatusBadRequest, "invalid_name"},
+		{"not JSON", path, "name=x", http.StatusBadRequest, "invalid_body"},
+		{"name already used", path, `{"name": "Liturgi Paskah"}`, http.StatusConflict, "name_taken"},
+		{"unknown template", "/api/v1/churches/gkj-sentolo/templates/99999999-2222-3333-4444-555555555555", `{"name": "X"}`, http.StatusNotFound, "not_found"},
+		{"malformed id", "/api/v1/churches/gkj-sentolo/templates/nope", `{"name": "X"}`, http.StatusNotFound, "not_found"},
+		{"church the user cannot see", "/api/v1/churches/other/templates/" + templateID, `{"name": "X"}`, http.StatusNotFound, "not_found"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := patch(router, tt.path, tt.body)
+			var body struct {
+				Error struct {
+					Code string `json:"code"`
+				} `json:"error"`
+			}
+			_ = json.Unmarshal(rec.Body.Bytes(), &body)
+			if rec.Code != tt.wantCode || body.Error.Code != tt.wantErr {
+				t.Errorf("status = %d, code = %q, want %d %q", rec.Code, body.Error.Code, tt.wantCode, tt.wantErr)
+			}
+		})
 	}
 }
