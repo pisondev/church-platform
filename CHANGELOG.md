@@ -1,8 +1,8 @@
 # Changelog
 
-All notable changes are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+All notable changes are recorded here, grouped by the date they landed, newest first. Inside a date the entries use the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) categories. Version numbers will follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once releases start.
 
-## [Unreleased]
+## 2026-10-08
 
 ### Added
 

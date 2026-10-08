@@ -138,7 +138,8 @@ Two songs are built in for now, KJ 40 and PKJ 192. Sign-in, templates and stored
 ## Conventions
 
 - English for code, comments, logs, docs, commits and UI copy.
-- [Conventional Commits](https://www.conventionalcommits.org) for messages, [Keep a Changelog](https://keepachangelog.com) for `CHANGELOG.md`.
+- [Conventional Commits](https://www.conventionalcommits.org) for messages.
+- `CHANGELOG.md` is grouped by date, newest first, with the [Keep a Changelog](https://keepachangelog.com) categories inside each date. Add a new `## YYYY-MM-DD` section on the first change of a day.
 - Every commit updates the affected docs and ships with tests.
 - Work lands directly on `main`.
 
