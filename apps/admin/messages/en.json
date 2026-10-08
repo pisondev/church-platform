@@ -6,6 +6,24 @@
     "title": "Admin panel",
     "lead": "Manage churches, admins and presentations from here.",
     "signInUnavailable": "Sign-in is not available yet.",
+    "openSongs": "Open the song library",
     "backToSite": "Back to the public site"
+  },
+  "Songs": {
+    "title": "Song library",
+    "lead": "Songs with notation and lyrics rendered by the system. Open one to preview its slides.",
+    "verseCount": "{count, plural, one {# verse} other {# verses}}",
+    "back": "All songs",
+    "versesLegend": "Verses to include",
+    "verse": "Verse {label}"
+  },
+  "Slideshow": {
+    "label": "Slides",
+    "previous": "Previous slide",
+    "next": "Next slide",
+    "present": "Present",
+    "position": "Slide {current} of {total}",
+    "goTo": "Go to slide {number}",
+    "hint": "Arrow keys, Space or a click move between slides. Esc leaves full screen."
   }
 }

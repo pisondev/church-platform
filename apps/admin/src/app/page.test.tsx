@@ -27,3 +27,9 @@ test("links back to the public site", () => {
     siteConfig.webUrl,
   );
 });
+
+test("links to the song library", () => {
+  renderWithMessages(<HomePage />);
+
+  expect(screen.getByRole("link", { name: messages.Home.openSongs })).toHaveAttribute("href", "/songs");
+});

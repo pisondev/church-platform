@@ -1,4 +1,5 @@
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Music, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { siteConfig } from "@/config/site";
@@ -20,9 +21,17 @@ export default function HomePage() {
           {t("signInUnavailable")}
         </p>
 
+        <Link
+          href="/songs"
+          className="mt-6 inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90"
+        >
+          <Music aria-hidden className="size-4" />
+          {t("openSongs")}
+        </Link>
+
         <a
           href={siteConfig.webUrl}
-          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline"
+          className="mt-6 flex items-center gap-2 text-sm font-medium text-accent hover:underline"
         >
           <ArrowLeft aria-hidden className="size-4" />
           {t("backToSite")}

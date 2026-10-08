@@ -19,6 +19,8 @@ All notable changes are recorded here. The format follows [Keep a Changelog](htt
 - GitHub Actions workflow that checks commit messages, the API and both frontends.
 - About, Contact, Privacy Policy and Terms of Service pages on the public site, with a shared header and footer.
 - Google sign-in setup guide and the matching `.env.example` entries.
+- Cipher notation engine in the admin panel: a text format for notes and lyrics, a parser that validates syllable counts, and a renderer that draws beams, slurs, octave dots, accidentals and bar lines.
+- Song library preview with KJ 40 and PKJ 192: verse selection, slides of two phrases at most, keyboard and click navigation, and full-screen presenting.
 
 ### Changed
 

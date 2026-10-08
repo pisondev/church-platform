@@ -12,7 +12,7 @@ The first feature in scope is Presentation: reusable liturgy templates and the w
 | --- | --- |
 | `apps/api` | HTTP API (Go, Gin, PostgreSQL) |
 | `apps/web` | Public site: landing, About, Contact, Privacy Policy and Terms of Service (Next.js, Tailwind CSS, Lucide) |
-| `apps/admin` | Admin panel for Super Admins and Church Admins (Next.js, Tailwind CSS, Lucide) |
+| `apps/admin` | Admin panel for Super Admins and Church Admins, with the song library and slide preview (Next.js, Tailwind CSS, Lucide) |
 | `infra` | Local infrastructure files used by Docker Compose |
 | `.githooks` | Versioned git hooks |
 | `scripts` | Repository tooling and its tests |
@@ -108,6 +108,14 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 - **Copy.** UI text lives in `messages/en.json` and is read through [next-intl](https://next-intl.dev). Keys are type-checked. To add a language, add its code to `src/i18n/config.ts`, add `messages/<code>.json`, and resolve the locale in `src/i18n/request.ts`.
 - **Tests.** Vitest with Testing Library. `renderWithMessages` in `src/test-utils.tsx` renders a component with the English messages.
 
+## Songs and slides
+
+The admin panel has a song library at `/songs`. Each song is stored as text and drawn by the system as cipher notation with aligned lyrics; see [Song notation format](docs/notation.md).
+
+A song page lets you choose verses and previews the slides: a title slide, then two phrases per slide at most. The slideshow moves with the arrow keys, Page Up, Page Down, Space, Home, End or a click, and Present opens it full screen.
+
+Two songs are built in for now, KJ 40 and PKJ 192. Sign-in, templates and stored presentations are not built yet.
+
 ## Git hooks
 
 `pnpm install` sets `core.hooksPath` to `.githooks`.
@@ -139,3 +147,4 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 - [Changelog](CHANGELOG.md)
 - [Deployment checklist](docs/deployment.md)
 - [Google sign-in setup](docs/google-oauth-setup.md)
+- [Song notation format](docs/notation.md)
