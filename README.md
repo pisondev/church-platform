@@ -54,6 +54,7 @@ pnpm dev:admin      # admin panel on http://localhost:3101
 | `pnpm test:api` | Runs the API tests; database tests are skipped |
 | `pnpm test:api:db` | Runs the API tests including the database tests |
 | `pnpm build` | Builds the API binary into `apps/api/bin` and both frontends |
+| `pnpm check` | Lint, type-check, test and build in one go. Run it before every commit |
 
 ## Configuration
 

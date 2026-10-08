@@ -22,6 +22,7 @@
     "test:api": "go -C apps/api test ./...",
     "test:api:db": "node scripts/test-api-db.mjs",
     "build": "pnpm run build:api && pnpm -r --if-present build",
-    "build:api": "go -C apps/api build -o bin/ ./cmd/api"
+    "build:api": "go -C apps/api build -o bin/ ./cmd/api",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
   }
 }

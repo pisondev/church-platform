@@ -14,9 +14,11 @@ export function generateStaticParams() {
   return songs.map((song) => ({ id: song.id }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const song = findSong((await params).id);
-  return { title: song ? `${song.book} ${song.number} ${song.title}` : undefined };
+// The title stays generic on purpose: reading params here would make the metadata depend on
+// the request, which Cache Components rejects for a page that is otherwise prerendered.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Songs");
+  return { title: t("title") };
 }
 
 export default async function SongPage({ params }: Props) {
