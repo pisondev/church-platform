@@ -18,7 +18,7 @@ func TestLoadAppliesDefaults(t *testing.T) {
 
 	want := Config{
 		Env:            EnvDevelopment,
-		HTTPAddr:       ":4000",
+		HTTPAddr:       "127.0.0.1:4000",
 		DatabaseURL:    "postgres://localhost/db",
 		WebURL:         "http://localhost:3100",
 		AdminURL:       "http://localhost:3101",
@@ -69,6 +69,22 @@ func TestLoadReadsOverrides(t *testing.T) {
 	}
 	if !cfg.Google.Configured() {
 		t.Error("Google sign-in not reported as configured")
+	}
+}
+
+func TestLoadListensOnEveryInterfaceInProduction(t *testing.T) {
+	cfg, err := Load(env(map[string]string{
+		"APP_ENV":                    "production",
+		"DATABASE_URL":               "postgres://db/prod",
+		"GOOGLE_OAUTH_CLIENT_ID":     "id",
+		"GOOGLE_OAUTH_CLIENT_SECRET": "secret",
+		"GOOGLE_OAUTH_REDIRECT_URL":  "https://api.example.org/callback",
+	}))
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.HTTPAddr != ":4000" {
+		t.Errorf("HTTPAddr = %q, want :4000", cfg.HTTPAddr)
 	}
 }
 

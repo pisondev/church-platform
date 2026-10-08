@@ -32,6 +32,7 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 - The product is now named EccleService, with the tagline "a service for your Ecclesia (a.k.a Church)".
 - Both apps are light only and no longer follow the system dark setting. Slides are dark text on white, which stays readable on a weak projector.
+- The API listens on loopback only outside production, so `pnpm dev:api` no longer triggers the Windows firewall prompt.
 - The changelog is grouped by date.
 
 ### Fixed

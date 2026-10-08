@@ -52,9 +52,18 @@ type Config struct {
 func Load(getenv func(string) string) (Config, error) {
 	get := func(key string) string { return strings.TrimSpace(getenv(key)) }
 
+	env := valueOr(get("APP_ENV"), EnvDevelopment)
+
+	// Outside production the API listens on loopback only. Nothing else needs to reach it,
+	// and Windows asks for firewall permission every time a new binary opens a public port.
+	defaultAddr := "127.0.0.1:4000"
+	if env == EnvProduction {
+		defaultAddr = ":4000"
+	}
+
 	cfg := Config{
-		Env:              valueOr(get("APP_ENV"), EnvDevelopment),
-		HTTPAddr:         valueOr(get("API_ADDR"), ":4000"),
+		Env:              env,
+		HTTPAddr:         valueOr(get("API_ADDR"), defaultAddr),
 		DatabaseURL:      get("DATABASE_URL"),
 		WebURL:           strings.TrimRight(valueOr(get("WEB_URL"), defaultWebURL), "/"),
 		AdminURL:         strings.TrimRight(valueOr(get("ADMIN_URL"), defaultAdminURL), "/"),

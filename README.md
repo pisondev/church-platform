@@ -63,7 +63,7 @@ The API reads environment variables, and loads `.env` from the repository root i
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `APP_ENV` | `development` | `development`, `test` or `production` |
-| `API_ADDR` | `:4000` | Listen address |
+| `API_ADDR` | `127.0.0.1:4000`, or `:4000` in production | Listen address. Loopback in development keeps Windows from asking for firewall permission on every run |
 | `DATABASE_URL` | required | PostgreSQL connection string |
 | `WEB_URL` | `http://localhost:3100` | Public site. Failed sign-ins return here |
 | `ADMIN_URL` | `http://localhost:3101` | Admin panel. Successful sign-ins land here |
