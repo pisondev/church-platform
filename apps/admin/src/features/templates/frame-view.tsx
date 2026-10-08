@@ -4,6 +4,8 @@ import { BookOpen, Music } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 
+import { SongSlideBody } from "@/features/songs/slide-view";
+
 import { Backdrop } from "./backdrop";
 import { BAND_HEIGHT, Bumper } from "./bumper";
 import { churchLogos } from "./church-logo";
@@ -133,7 +135,8 @@ export function FrameView({ frame, church, live = false }: { frame: Frame; churc
     <div className="slide-frame">
       {slide.kind === "cover" && <CoverFrame content={slide.content} church={church} live={live} />}
       {slide.kind === "section" && <Section {...slide.content} live={live} />}
-      {(slide.kind === "song" || slide.kind === "scripture") && <Slot kind={slide.kind} />}
+      {slide.kind === "song" && (frame.song ? <SongSlideBody slide={frame.song} /> : <Slot kind="song" />)}
+      {slide.kind === "scripture" && <Slot kind="scripture" />}
       {slide.kind === "responsive_reading" && (
         <Reading
           title={slide.content.title}

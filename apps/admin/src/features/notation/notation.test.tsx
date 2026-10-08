@@ -31,3 +31,22 @@ test("stretches a syllable under its note and sustain", () => {
   expect(screen.getByText("jaib")).toHaveStyle({ gridColumn: "3 / 5", gridRow: "5" });
   expect(screen.getByText("be-")).toHaveStyle({ gridColumn: "5 / 7" });
 });
+
+test("a phrase without triplets keeps the five rows of the stylesheet", () => {
+  const { container } = render(<Notation phrase={phrase} />);
+
+  expect((container.firstElementChild as HTMLElement).style.gridTemplateRows).toBe("");
+});
+
+test("a triplet gets a mark with a 3 over its notes, on a row of its own", () => {
+  const triplet = parsePhrase("5 {[6 6 7]} 1'", "ti- a- da ber- u");
+  const { container } = render(<Notation phrase={triplet} />);
+  const mark = screen.getByText("3").parentElement as HTMLElement;
+
+  // Over the second, third and fourth cell, in the first row.
+  expect(mark).toHaveStyle({ gridColumn: "2 / 5", gridRow: "1" });
+  expect((container.firstElementChild as HTMLElement).style.gridTemplateRows.split(" ")).toHaveLength(6);
+  // Everything else sits one row lower than usual.
+  expect(container.querySelector(".nt-beam")).toHaveStyle({ gridRow: "3" });
+  expect(screen.getByText("ti-")).toHaveStyle({ gridRow: "6" });
+});

@@ -3,6 +3,7 @@ package seed
 // The first template: the regular Sunday order of worship at GKJ Sentolo, taken from the
 // slides the church used before. Its text is worship content and stays in Indonesian.
 // Blank, image and free-text pages of the old slides have no slide type yet and are left out.
+// Songs that are sung every week are named; the other song slides are slots to fill.
 
 // FirstTemplateName is the name of the template created by Run.
 const FirstTemplateName = "Liturgi Umum"
@@ -30,6 +31,13 @@ type reading struct {
 
 type slot struct{}
 
+// A song that is the same every week. The name is the id of a song in the library of the
+// admin app. Without verses the whole song is sung.
+type fixedSongRef struct {
+	Song   string   `json:"song"`
+	Verses []string `json:"verses,omitempty"`
+}
+
 func section(title string, subtitle ...string) seedSlide {
 	content := heading{Title: title}
 	if len(subtitle) > 0 {
@@ -40,6 +48,10 @@ func section(title string, subtitle ...string) seedSlide {
 
 func song() seedSlide      { return seedSlide{Kind: "song", Content: slot{}} }
 func scripture() seedSlide { return seedSlide{Kind: "scripture", Content: slot{}} }
+
+func fixedSong(id string, verses ...string) seedSlide {
+	return seedSlide{Kind: "song", Content: fixedSongRef{Song: id, Verses: verses}}
+}
 
 func responsive(title string, lines ...readingLine) seedSlide {
 	return seedSlide{Kind: "responsive_reading", Content: reading{Title: title, Lines: lines}}
@@ -63,7 +75,7 @@ func liturgiUmum() []seedSlide {
 		section("Persiapan Ibadah", "Jemaat mempersiapkan diri memasuki ibadah. Majelis mempersiapkan di ruang konsistori."),
 		section("Bel", "Jemaat berdiri. Majelis menyapa dan mengajak memuji Tuhan."),
 		section("Nyanyian Awal Kebaktian"),
-		song(),
+		fixedSong("nr-3", "1", "2"),
 		section("Votum"),
 		responsive("Votum", together("Amin, amin, amin.")...),
 		responsive("Salam", readingLine{Role: "J", Text: "Dan menyertai Saudara juga."}),
@@ -84,10 +96,10 @@ func liturgiUmum() []seedSlide {
 		section("Jemaat Duduk"),
 		section("Doa Epiklese"),
 		section("Nyanyian"),
-		song(),
+		fixedSong("pkj-15", "1"),
 		section("Pembacaan Firman"),
 		scripture(),
-		responsive("Haleluya, Amin", together("Haleluya, amin. Haleluya, amin.")...),
+		fixedSong("haleluya-amin"),
 		section("Khotbah"),
 		section("Saat Teduh"),
 		section("Jemaat Berdiri"),
@@ -125,8 +137,9 @@ func liturgiUmum() []seedSlide {
 			readingLine{Role: "J", Text: "Kini dan selamanya."},
 		),
 		section("Berkat", "Menyanyikan Haleluya, Amin"),
+		fixedSong("nkb-225"),
 		section("Nyanyian Penutup"),
-		song(),
+		fixedSong("kp-102", "1"),
 		section("Jemaat Duduk"),
 		section("Saat Teduh Pribadi"),
 		section("Selamat Hari Minggu", "Segenap Majelis mengucapkan selamat hari Minggu. Kiranya Tuhan selalu memberkati aktivitas selanjutnya."),

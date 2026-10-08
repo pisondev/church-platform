@@ -20,6 +20,8 @@ verses: [
 
 A refrain, when present, has its own melody and lyrics and is repeated after every verse.
 
+A song that is one piece, not a set of numbered verses, has a single verse with an empty label. A sung response of the liturgy belongs to no book: it leaves out `book` and `number`.
+
 ## Notes
 
 Tokens are separated by spaces.
@@ -39,8 +41,11 @@ Tokens are separated by spaces.
 | `'` | Breath mark, when it stands alone |
 | `[3 1]` | Beam: the notes share a line above them. Nest for a second line: `[[3 1]]` |
 | `(3 1)` | Slur or tie: the notes are sung on one syllable. It may cross a bar line |
+| `{4 3 2}` | Triplet: three notes in the time of two, drawn under an arc with a 3 |
 
-Beams and slurs combine in either order: `[(3 1)]`, `(5 [. 3])`.
+Beams and slurs combine in either order: `[(3 1)]`, `(5 [. 3])`. A triplet can be beamed: `{[6 6 7]}`. A dotted note followed by a short one is a beam with a second beam inside it: `[1 [. 3]]`.
+
+A phrase may start partway through a bar, even on a sustain (`[. 4] | [5 5]`), when the melody runs on from the phrase before.
 
 ## Lyrics
 
@@ -59,8 +64,10 @@ The parser rejects a phrase whose syllable count does not match its sung notes, 
 
 ## Adding a song
 
-1. Add a file under `apps/admin/src/features/songs/data` and list it in `library.ts`.
+1. Add a file under `apps/admin/src/features/songs/data` and list it in `library.ts`. A new song book goes into `songBooks` in `types.ts`.
 2. Run `pnpm --filter @church-platform/admin test`. The suite parses every phrase of every verse.
 3. Open `/songs` in the admin panel and check the slides against the hymnal.
+
+A template shows a song when one of its song slides names the id of that song.
 
 The built-in songs live in the admin app for now. They move behind the API once the song library has its own storage.

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { parsePhrase } from "@/features/notation/parse";
 
-import { songs } from "./library";
+import { findSong, songs } from "./library";
 import { buildSongSlides, PHRASES_PER_SLIDE } from "./slides";
 import type { Song } from "./types";
 
@@ -88,6 +88,19 @@ describe.each(songs.map((song) => [song.id, song] as const))("built-in song %s",
       for (const phrase of slide.phrases) {
         expect(() => parsePhrase(phrase.notes, phrase.lyrics), phrase.lyrics).not.toThrow();
       }
+    }
+  });
+});
+
+describe("the songs of every week", () => {
+  // The seeded template of the API names these, so they must stay in the library.
+  test.each(["nr-3", "pkj-15", "haleluya-amin", "nkb-225", "kp-102"])("%s is in the library", (id) => {
+    expect(findSong(id)).toBeDefined();
+  });
+
+  test("a song sung as one piece has a single verse without a number", () => {
+    for (const id of ["haleluya-amin", "nkb-225"]) {
+      expect(findSong(id)!.verses.map((verse) => verse.label)).toEqual([""]);
     }
   });
 });

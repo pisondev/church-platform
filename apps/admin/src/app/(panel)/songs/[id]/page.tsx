@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server";
 
 import { findSong, songs } from "@/features/songs/library";
 import { SongPresenter } from "@/features/songs/song-presenter";
-import { songBooks } from "@/features/songs/types";
+import { songBooks, songReference } from "@/features/songs/types";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -34,10 +34,10 @@ export default async function SongPage({ params }: Props) {
         {t("back")}
       </Link>
       <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-        {song.book} {song.number} · {song.title}
+        {[songReference(song), song.title].filter(Boolean).join(" · ")}
       </h1>
       <p className="mt-2 mb-8 text-muted">
-        {[songBooks[song.book], song.key, song.meter, song.tempo].filter(Boolean).join(" · ")}
+        {[song.book && songBooks[song.book], song.key, song.meter, song.tempo].filter(Boolean).join(" · ")}
       </p>
 
       <SongPresenter song={song} />

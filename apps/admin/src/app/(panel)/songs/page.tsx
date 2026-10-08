@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server";
 
 import { siteConfig } from "@/config/site";
 import { songs } from "@/features/songs/library";
-import { songBooks } from "@/features/songs/types";
+import { hasVerses, songBooks, songReference } from "@/features/songs/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Songs");
@@ -35,10 +35,15 @@ export default function SongsPage() {
               <Music aria-hidden className="mt-1 size-5 shrink-0 text-accent" />
               <span>
                 <span className="block font-medium">
-                  {song.book} {song.number} · {song.title}
+                  {[songReference(song), song.title].filter(Boolean).join(" · ")}
                 </span>
                 <span className="mt-1 block text-sm text-muted">
-                  {songBooks[song.book]} · {t("verseCount", { count: song.verses.length })}
+                  {[
+                    song.book && songBooks[song.book],
+                    hasVerses(song) ? t("verseCount", { count: song.verses.length }) : song.key,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </span>
               </span>
             </Link>

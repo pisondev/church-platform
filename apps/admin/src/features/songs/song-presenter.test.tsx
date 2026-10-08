@@ -4,6 +4,7 @@ import { expect, test } from "vitest";
 import { renderWithMessages } from "@/test-utils";
 
 import { kj40 } from "./data/kj-40";
+import { findSong } from "./library";
 import { SongPresenter } from "./song-presenter";
 
 // KJ 40: a title slide, then three verses of four phrases at two phrases per slide.
@@ -71,4 +72,12 @@ test("rebuilds the slides when a verse is removed, keeping at least one", () => 
   fireEvent.click(screen.getByRole("checkbox", { name: "Verse 2" }));
   expect(position(1, 3)).toBeInTheDocument();
   expect(screen.getByRole("checkbox", { name: "Verse 1" })).toBeDisabled();
+});
+
+test("a song that is one piece offers no verses to choose from", () => {
+  renderWithMessages(<SongPresenter song={findSong("nkb-225")!} />);
+
+  expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  // The title slide, then its three phrases on two slides.
+  expect(position(1, 3)).toBeInTheDocument();
 });

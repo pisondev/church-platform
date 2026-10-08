@@ -61,6 +61,36 @@ describe("buildFrames", () => {
     ]);
   });
 
+  test("a song slide that names a song becomes the frames of that song", () => {
+    const frames = buildFrames([{ id: "s", position: 1, kind: "song", content: { song: "nr-3", verses: ["2"] } }]);
+
+    // The title, then the six phrases of the one verse, two at a time.
+    expect(frames.map((frame) => [frame.key, frame.song?.kind])).toEqual([
+      ["s-1", "title"],
+      ["s-2", "phrases"],
+      ["s-3", "phrases"],
+      ["s-4", "phrases"],
+    ]);
+    expect(frames[0].song).toMatchObject({ verseLabels: ["2"] });
+    expect(frames.every((frame) => frame.slide.id === "s")).toBe(true);
+  });
+
+  test("without verses the whole song is sung", () => {
+    const [title] = buildFrames([{ id: "s", position: 1, kind: "song", content: { song: "nr-3" } }]);
+
+    expect(title.song).toMatchObject({ verseLabels: ["1", "2"] });
+  });
+
+  test("a song slide that names nothing, or a song the library lacks, stays one empty slot", () => {
+    for (const content of [{}, { song: "no-such-song" }]) {
+      const frames = buildFrames([{ id: "s", position: 1, kind: "song", content }]);
+
+      expect(frames).toHaveLength(1);
+      expect(frames[0].key).toBe("s");
+      expect(frames[0].song).toBeUndefined();
+    }
+  });
+
   test("spreads a long reading over numbered frames", () => {
     const reading = buildFrames(slides).filter((frame) => frame.slide.id === "c");
 

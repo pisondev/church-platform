@@ -2,6 +2,7 @@ package seed_test
 
 import (
 	"context"
+	"slices"
 	"testing"
 
 	"github.com/pisondev/church-platform/apps/api/internal/database"
@@ -117,6 +118,28 @@ func TestRunSeedsTheFirstTemplate(t *testing.T) {
 	}
 	if kinds["cover"] != 1 {
 		t.Errorf("cover slides = %d, want 1", kinds["cover"])
+	}
+	// The songs that are the same every week are named, in the order they are sung.
+	named, err := pool.Query(ctx, `
+		SELECT content->>'song' FROM template_slides
+		WHERE template_id = $1 AND kind = 'song' AND content->>'song' IS NOT NULL ORDER BY position`, templateID)
+	if err != nil {
+		t.Fatalf("list named songs: %v", err)
+	}
+	defer named.Close()
+	var songs []string
+	for named.Next() {
+		var id string
+		if err := named.Scan(&id); err != nil {
+			t.Fatalf("scan: %v", err)
+		}
+		songs = append(songs, id)
+	}
+	if want := []string{"nr-3", "pkj-15", "haleluya-amin", "nkb-225", "kp-102"}; !slices.Equal(songs, want) {
+		t.Errorf("named songs = %v, want %v", songs, want)
+	}
+	if kinds["song"] <= len(songs) {
+		t.Errorf("song slides = %d, want empty slots besides the %d named songs", kinds["song"], len(songs))
 	}
 }
 

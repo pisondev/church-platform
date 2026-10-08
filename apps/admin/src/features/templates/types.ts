@@ -1,5 +1,7 @@
 // Shapes returned by the church and template endpoints of the API.
 
+import type { SongSlide } from "@/features/songs/types";
+
 export type Church = { id: string; name: string; slug: string; status: string };
 
 export type TemplateSummary = {
@@ -17,7 +19,9 @@ type Base = { id: string; position: number };
 export type TemplateSlide =
   | (Base & { kind: "cover"; content: { title?: string; subtitle?: string; footer?: string } })
   | (Base & { kind: "section"; content: { title?: string; subtitle?: string } })
-  | (Base & { kind: "song"; content: Record<string, never> })
+  // An empty slot, or a song of the library that is the same every week. Without verses
+  // the whole song is sung.
+  | (Base & { kind: "song"; content: { song?: string; verses?: string[] } })
   | (Base & { kind: "scripture"; content: Record<string, never> })
   | (Base & { kind: "responsive_reading"; content: { title?: string; lines?: ReadingLine[] } });
 
@@ -31,4 +35,6 @@ export type Frame = {
   lines?: ReadingLine[];
   page?: number;
   pages?: number;
+  // Set for a song slide that names a song: the part of the song on this frame.
+  song?: SongSlide;
 };

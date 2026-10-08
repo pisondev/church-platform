@@ -90,11 +90,11 @@ Migrations are plain SQL files in `apps/api/internal/database/migrations`, embed
 | `church_admins` | Which users administer which churches |
 | `sessions` | Signed-in browsers. Holds the SHA-256 of each session token, never the token |
 | `templates` | Reusable orders of worship, per church, with a slide ratio |
-| `template_slides` | The slides of a template in order. `kind` is `cover`, `section`, `song`, `scripture` or `responsive_reading`, and `content` is JSON shaped by the kind |
+| `template_slides` | The slides of a template in order. `kind` is `cover`, `section`, `song`, `scripture` or `responsive_reading`, and `content` is JSON shaped by the kind. A song slide is `{}` for an empty slot, or `{"song": "nr-3", "verses": ["1", "2"]}` for a song of the library; without `verses` the whole song is sung |
 
 Churches and users are soft-deleted through `deleted_at`. Emails are stored lowercase.
 
-`pnpm db:seed` creates the first church, GKJ Sentolo, grants Super Admin to every email in `SUPER_ADMIN_EMAILS`, and creates the first template, "Liturgi Umum", from the order of worship the church already uses. The template is created once: a later seed leaves an edited template alone.
+`pnpm db:seed` creates the first church, GKJ Sentolo, grants Super Admin to every email in `SUPER_ADMIN_EMAILS`, and creates the first template, "Liturgi Umum", from the order of worship the church already uses. The template names the five songs that are sung every week: the opening song (NR 3), the song after the epiclesis prayer (PKJ 15), "Haleluya, Amin" after the reading, "Haleluya, Amin" after the blessing (NKB 225) and the closing song (KP 102). The template is created once: a later seed leaves an edited template alone.
 
 Database tests need `TEST_DATABASE_URL`. Each test runs in its own schema and drops it afterwards.
 
@@ -136,7 +136,7 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 
 The admin home lists the churches the signed-in user manages, and a church page lists its templates.
 
-A template is an ordered list of slides of five kinds: cover, section, song, scripture and responsive reading. Song and scripture slides are empty slots, filled when a presentation is made. A responsive reading that does not fit on one screen is spread over numbered screens, and each role has its own color.
+A template is an ordered list of slides of five kinds: cover, section, song, scripture and responsive reading. A scripture slide is an empty slot, filled when a presentation is made. So is a song slide, unless it names a song that is sung every week: then it shows that song, its title first and then two phrases at a time. A responsive reading that does not fit on one screen is spread over numbered screens, and each role has its own color.
 
 Opening a template starts the editor, laid out like a slides application:
 
@@ -183,7 +183,9 @@ The admin panel has a song library at `/songs`. Each song is stored as text and 
 
 A song page lets you choose verses and previews the slides: a title slide, then two phrases per slide at most. The slideshow moves with the arrow keys, Page Up, Page Down, Space, Home, End or a click, and Present opens it full screen.
 
-Two songs are built in for now, KJ 40 and PKJ 192.
+Seven songs are built in for now: KJ 40, PKJ 15, PKJ 192, NKB 225, NR 3, KP 102 and the response "Haleluya, Amin", which belongs to no book. The books are KJ, PKJ, KPJ, KK, KPK, NKB (Nyanyikanlah Kidung Baru), NR (Nyanyian Rohani) and KP (Kidung Pujian).
+
+A song slide of a template names a song by its id in `apps/admin/src/features/songs/library.ts`. The seeded template of the API uses those ids, and a test in the admin app keeps them in the library.
 
 ## Git hooks
 

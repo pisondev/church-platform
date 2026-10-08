@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { SlideView } from "./slide-view";
 import { buildSongSlides } from "./slides";
 import { Slideshow } from "./slideshow";
-import type { Song } from "./types";
+import { hasVerses, type Song } from "./types";
 
 // Lets the user choose verses and previews the resulting slides.
 export function SongPresenter({ song }: { song: Song }) {
@@ -24,25 +24,28 @@ export function SongPresenter({ song }: { song: Song }) {
 
   return (
     <div>
-      <fieldset className="mb-6 flex flex-wrap items-center gap-4">
-        <legend className="mb-2 text-sm font-medium">{t("versesLegend")}</legend>
-        {song.verses.map((verse) => {
-          const checked = selected.includes(verse.label);
-          return (
-            <label key={verse.label} className="inline-flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                className="size-4 accent-(--accent)"
-                checked={checked}
-                // At least one verse stays selected.
-                disabled={checked && selected.length === 1}
-                onChange={() => toggle(verse.label)}
-              />
-              {t("verse", { label: verse.label })}
-            </label>
-          );
-        })}
-      </fieldset>
+      {/* A song that is one piece has no verses to choose from. */}
+      {hasVerses(song) && (
+        <fieldset className="mb-6 flex flex-wrap items-center gap-4">
+          <legend className="mb-2 text-sm font-medium">{t("versesLegend")}</legend>
+          {song.verses.map((verse) => {
+            const checked = selected.includes(verse.label);
+            return (
+              <label key={verse.label} className="inline-flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-(--accent)"
+                  checked={checked}
+                  // At least one verse stays selected.
+                  disabled={checked && selected.length === 1}
+                  onChange={() => toggle(verse.label)}
+                />
+                {t("verse", { label: verse.label })}
+              </label>
+            );
+          })}
+        </fieldset>
+      )}
 
       <Slideshow slides={slides} />
     </div>

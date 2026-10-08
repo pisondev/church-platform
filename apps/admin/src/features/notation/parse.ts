@@ -6,6 +6,7 @@
 //   5~     fermata             |    bar line        ||   final bar     '    breath mark
 //   [3 1]  beamed (half beat); nest for a second beam: [[3 1]]
 //   (3 1)  slurred or tied: sung on one syllable
+//   {4 3 2}  triplet: three notes in the time of two
 //
 // Lyrics line: one syllable per sung note, separated by spaces. End a syllable with "-"
 // when the word continues. Use "_" for a note without a syllable.
@@ -28,6 +29,7 @@ export type Phrase = {
   cells: Cell[];
   beams: Beam[];
   slurs: Span[];
+  tuplets: Span[];
   syllables: Syllable[];
 };
 
@@ -67,16 +69,22 @@ function parseCell(token: string): Cell {
   };
 }
 
-type OpenGroup = { type: "beam" | "slur"; start: number };
+type GroupType = "beam" | "slur" | "tuplet";
+type OpenGroup = { type: GroupType; start: number };
+
+const OPENERS: Record<string, GroupType> = { "[": "beam", "(": "slur", "{": "tuplet" };
+const CLOSERS: Record<string, GroupType> = { "]": "beam", ")": "slur", "}": "tuplet" };
+const OPENER_OF: Record<GroupType, string> = { beam: "[", slur: "(", tuplet: "{" };
 
 function parseCells(notes: string) {
   const cells: Cell[] = [];
   const beams: Beam[] = [];
   const slurs: Span[] = [];
+  const tuplets: Span[] = [];
   const open: OpenGroup[] = [];
 
   const close = (closer: string) => {
-    const type = closer === "]" ? "beam" : "slur";
+    const type = CLOSERS[closer];
     const group = open.pop();
     if (!group || group.type !== type) throw new NotationError(`Unbalanced "${closer}"`);
 
@@ -87,6 +95,10 @@ function parseCells(notes: string) {
       slurs.push(span);
       return;
     }
+    if (type === "tuplet") {
+      tuplets.push(span);
+      return;
+    }
     const level = open.filter((g) => g.type === "beam").length + 1;
     if (level > 2) throw new NotationError("Beams nest two levels at most");
     beams.push({ ...span, level: level as 1 | 2 });
@@ -94,12 +106,12 @@ function parseCells(notes: string) {
 
   for (const raw of notes.trim().split(/\s+/).filter(Boolean)) {
     let token = raw;
-    while (token.startsWith("[") || token.startsWith("(")) {
-      open.push({ type: token[0] === "[" ? "beam" : "slur", start: cells.length });
+    while (token[0] in OPENERS) {
+      open.push({ type: OPENERS[token[0]], start: cells.length });
       token = token.slice(1);
     }
     let closers = "";
-    while (token.endsWith("]") || token.endsWith(")")) {
+    while (token.slice(-1) in CLOSERS) {
       closers = token.slice(-1) + closers;
       token = token.slice(0, -1);
     }
@@ -109,11 +121,11 @@ function parseCells(notes: string) {
   }
 
   if (open.length > 0) {
-    throw new NotationError(`Unclosed "${open[open.length - 1].type === "beam" ? "[" : "("}"`);
+    throw new NotationError(`Unclosed "${OPENER_OF[open[open.length - 1].type]}"`);
   }
 
   const byStart = (a: Span, b: Span) => a.start - b.start || b.end - a.end;
-  return { cells, beams: beams.sort(byStart), slurs: slurs.sort(byStart) };
+  return { cells, beams: beams.sort(byStart), slurs: slurs.sort(byStart), tuplets: tuplets.sort(byStart) };
 }
 
 // A note carries a syllable unless it continues a slur.
@@ -138,7 +150,7 @@ function syllableEnd(cells: Cell[], slurs: Span[], start: number): number {
 }
 
 export function parsePhrase(notes: string, lyrics = ""): Phrase {
-  const { cells, beams, slurs } = parseCells(notes);
+  const { cells, beams, slurs, tuplets } = parseCells(notes);
   if (cells.length === 0) throw new NotationError("A phrase needs at least one note");
 
   const words = lyrics.trim().split(/\s+/).filter(Boolean);
@@ -157,5 +169,5 @@ export function parsePhrase(notes: string, lyrics = ""): Phrase {
     });
   }
 
-  return { cells, beams, slurs, syllables };
+  return { cells, beams, slurs, tuplets, syllables };
 }

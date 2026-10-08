@@ -129,3 +129,29 @@ describe("syllables", () => {
     expect(() => parsePhrase("1 2 3", "sa- tu")).toThrow("Expected 3 syllables but got 2");
   });
 });
+
+describe("triplets", () => {
+  test("braces mark three notes sung in the time of two", () => {
+    const phrase = parsePhrase("5 {4' 3' 2'} | 1'", "ti- a- da ber- bah");
+
+    expect(phrase.tuplets).toEqual([{ start: 1, end: 3 }]);
+    // Every note of a triplet carries its own syllable.
+    expect(phrase.syllables.map((syllable) => syllable.text)).toEqual(["ti-", "a-", "da", "ber-", "bah"]);
+  });
+
+  test("a triplet can be beamed, and a phrase can hold more than one", () => {
+    const phrase = parsePhrase("{[6 6 7]} 1 {1 2 3}");
+
+    expect(phrase.tuplets).toEqual([
+      { start: 0, end: 2 },
+      { start: 4, end: 6 },
+    ]);
+    expect(phrase.beams).toEqual([{ start: 0, end: 2, level: 1 }]);
+  });
+
+  test("an unclosed or stray brace is rejected", () => {
+    expect(() => parsePhrase("{4 3 2")).toThrow('Unclosed "{"');
+    expect(() => parsePhrase("4 3 2}")).toThrow('Unbalanced "}"');
+    expect(() => parsePhrase("{4 3 2]")).toThrow('Unbalanced "]"');
+  });
+});

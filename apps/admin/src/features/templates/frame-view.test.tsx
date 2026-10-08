@@ -78,6 +78,25 @@ test.each([
   expect(screen.getByText(messages.Templates.slots.hint)).toBeInTheDocument();
 });
 
+test("a song slide that names a song shows that song, title first", () => {
+  const slide: TemplateSlide = { id: "1", position: 1, kind: "song", content: { song: "nr-3", verses: ["1", "2"] } };
+  const { unmount } = renderSlide(slide);
+
+  expect(screen.getByText("NR 3 : 1, 2")).toBeInTheDocument();
+  expect(screen.queryByText(messages.Templates.slots.hint)).not.toBeInTheDocument();
+  unmount();
+
+  // The next frame carries the first two phrases, drawn as notation.
+  renderSlide(slide, 1);
+  expect(screen.getByRole("img", { name: "Hormat bagi Allah Bapa," })).toBeInTheDocument();
+});
+
+test("a song slide that names a song the library lacks is an empty slot", () => {
+  renderSlide({ id: "1", position: 1, kind: "song", content: { song: "no-such-song" } });
+
+  expect(screen.getByText(messages.Templates.slots.song)).toBeInTheDocument();
+});
+
 test("responsive reading shows each line with its role, colored by role", () => {
   renderSlide({
     id: "1",
