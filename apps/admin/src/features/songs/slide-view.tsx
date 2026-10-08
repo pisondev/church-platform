@@ -18,7 +18,7 @@ function Reference({ song }: { song: Song }) {
 function TitleSlide({ song, verseLabels }: { song: Song; verseLabels: string[] }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-[2.4cqw] px-[6cqw] text-center">
-      <p className="text-[2.2cqw] tracking-wide text-white/60 uppercase">{songBooks[song.book]}</p>
+      <p className="text-[2.2cqw] tracking-wide text-(--slide-muted) uppercase">{songBooks[song.book]}</p>
       <p className="text-[5.2cqw] leading-tight font-semibold">
         <Reference song={song} /> : {verseLabels.join(", ")}
       </p>
@@ -35,9 +35,9 @@ function PhraseSlide({ slide }: { slide: Extract<SongSlide, { kind: "phrases" }>
       <header className="flex items-baseline justify-between gap-[2cqw] text-[2.2cqw]">
         <p className="truncate">
           <Reference song={song} />
-          <span className="ml-[1.4cqw] text-white/70">{song.title}</span>
+          <span className="ml-[1.4cqw] text-(--slide-muted)">{song.title}</span>
         </p>
-        <p className="shrink-0 text-[1.8cqw] text-white/60">
+        <p className="shrink-0 text-[1.8cqw] text-(--slide-muted)">
           {[song.key, song.meter, song.tempo].filter(Boolean).join("  ·  ")}
         </p>
       </header>
@@ -50,11 +50,11 @@ function PhraseSlide({ slide }: { slide: Extract<SongSlide, { kind: "phrases" }>
         ))}
       </FitToWidth>
 
-      <footer className="text-[1.8cqw] text-white/60">
+      <footer className="text-[1.8cqw] text-(--slide-muted)">
         {section.kind === "refrain" ? (
           <span>Refrein</span>
         ) : (
-          <span className="inline-flex size-[3cqw] items-center justify-center rounded-full border border-white/50 font-semibold text-white">
+          <span className="inline-flex size-[3cqw] items-center justify-center rounded-full border border-current font-semibold text-[#0a0a0a]">
             {section.label}
           </span>
         )}

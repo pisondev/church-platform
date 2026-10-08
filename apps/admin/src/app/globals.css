@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
+/* Light only. Projectors wash out dark screens, so a dark theme is left for later:
+   override these tokens to add one. */
 :root {
+  color-scheme: light;
   --background: #fafaf9;
   --foreground: #1c1917;
   --muted: #57534e;
@@ -8,18 +11,6 @@
   --surface: #ffffff;
   --accent: #1d4ed8;
   --accent-foreground: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0c0a09;
-    --foreground: #f5f5f4;
-    --muted: #a8a29e;
-    --border: #292524;
-    --surface: #1c1917;
-    --accent: #60a5fa;
-    --accent-foreground: #0c0a09;
-  }
 }
 
 @theme inline {
@@ -169,22 +160,23 @@ body {
   color: var(--slide-lyric, inherit);
 }
 
-/* Slides are always dark, whatever the page theme. */
+/* Slides are dark text on white: that is what stays readable on a weak projector. */
 .slide-frame {
-  --slide-lyric: #fde68a;
+  --slide-muted: #404040;
+  --slide-lyric: #1e3a8a;
   container-type: inline-size;
   aspect-ratio: 16 / 9;
   width: 100%;
   overflow: hidden;
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #0a0a0a;
 }
 
 .slide-stage:fullscreen {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000;
+  background: #fff;
 }
 
 .slide-stage:fullscreen > .slide-frame {

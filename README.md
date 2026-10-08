@@ -106,6 +106,7 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 - **Product identity.** The name, tagline, operator and contact email live in `src/config/site.ts` of each app. Change them there only.
 - **Legal text.** The Privacy Policy and Terms of Service are English only and live in `apps/web/src/content`. They are drafts until reviewed.
 - **Copy.** UI text lives in `messages/en.json` and is read through [next-intl](https://next-intl.dev). Keys are type-checked. To add a language, add its code to `src/i18n/config.ts`, add `messages/<code>.json`, and resolve the locale in `src/i18n/request.ts`.
+- **Theme.** Light only, and slides are dark text on white, because weak projectors wash out dark screens. Colors are CSS variables in each app's `globals.css`, so a dark theme can be added later by overriding them.
 - **Tests.** Vitest with Testing Library. `renderWithMessages` in `src/test-utils.tsx` renders a component with the English messages.
 
 ## Songs and slides
