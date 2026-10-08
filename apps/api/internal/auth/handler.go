@@ -212,9 +212,14 @@ func (h *Handler) RequireUser() gin.HandlerFunc {
 			return
 		}
 
-		c.Set(userKey, user)
+		SetCurrentUser(c, user)
 		c.Next()
 	}
+}
+
+// SetCurrentUser stores the signed-in user on the request. RequireUser calls it.
+func SetCurrentUser(c *gin.Context, user User) {
+	c.Set(userKey, user)
 }
 
 // CurrentUser returns the user stored by RequireUser.

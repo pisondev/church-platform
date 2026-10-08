@@ -89,10 +89,12 @@ Migrations are plain SQL files in `apps/api/internal/database/migrations`, embed
 | `users` | Accounts, matched to Google sign-ins by email. `is_super_admin` marks platform owners |
 | `church_admins` | Which users administer which churches |
 | `sessions` | Signed-in browsers. Holds the SHA-256 of each session token, never the token |
+| `templates` | Reusable orders of worship, per church, with a slide ratio |
+| `template_slides` | The slides of a template in order. `kind` is `cover`, `section`, `song`, `scripture` or `responsive_reading`, and `content` is JSON shaped by the kind |
 
 Churches and users are soft-deleted through `deleted_at`. Emails are stored lowercase.
 
-`pnpm db:seed` creates the first church, GKJ Sentolo, and grants Super Admin to every email in `SUPER_ADMIN_EMAILS`.
+`pnpm db:seed` creates the first church, GKJ Sentolo, grants Super Admin to every email in `SUPER_ADMIN_EMAILS`, and creates the first template, "Liturgi Umum", from the order of worship the church already uses. The template is created once: a later seed leaves an edited template alone.
 
 Database tests need `TEST_DATABASE_URL`. Each test runs in its own schema and drops it afterwards.
 
@@ -106,8 +108,13 @@ Database tests need `TEST_DATABASE_URL`. Each test runs in its own schema and dr
 | `GET /api/v1/auth/google/callback` | Finishes sign-in, sets the session cookie and redirects |
 | `GET /api/v1/auth/me` | The signed-in user and the churches they manage, or 401 |
 | `POST /api/v1/auth/logout` | Ends the session |
+| `GET /api/v1/churches/:slug` | A church the user manages |
+| `GET /api/v1/churches/:slug/templates` | Its templates, with slide counts |
+| `GET /api/v1/churches/:slug/templates/:id` | One template with its slides in order |
 
 Sign-in is Google only and limited to emails that already exist in `users`: Super Admins come from `SUPER_ADMIN_EMAILS` through `pnpm db:seed`. The session is an opaque token in an httpOnly, SameSite=Lax cookie that lasts 7 days. A failed sign-in redirects to `WEB_URL/login?error=<reason>`.
+
+Church routes need a session. A Super Admin reaches every church, a Church Admin only the ones assigned to them; anything else answers 404, the same as a church that does not exist.
 
 Every state-changing request must carry an `Origin` header from the allowed origins, otherwise it gets 403.
 

@@ -23,6 +23,7 @@ import (
 	"github.com/pisondev/church-platform/apps/api/internal/database"
 	"github.com/pisondev/church-platform/apps/api/internal/seed"
 	"github.com/pisondev/church-platform/apps/api/internal/server"
+	"github.com/pisondev/church-platform/apps/api/internal/templates"
 )
 
 const shutdownTimeout = 10 * time.Second
@@ -103,13 +104,15 @@ func serve(ctx context.Context, cfg config.Config, pool *pgxpool.Pool, logger *s
 		CookieDomain:  cfg.CookieDomain,
 	})
 
+	templateHandler := templates.NewHandler(templates.NewPostgresStore(pool), authHandler.RequireUser(), logger)
+
 	srv := &http.Server{
 		Addr: cfg.HTTPAddr,
 		Handler: server.NewRouter(server.Options{
 			Logger:         logger,
 			AllowedOrigins: cfg.AllowedOrigins,
 			DB:             pool,
-			Features:       []server.Routes{authHandler},
+			Features:       []server.Routes{authHandler, templateHandler},
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}

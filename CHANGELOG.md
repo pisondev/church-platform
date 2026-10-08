@@ -25,6 +25,7 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 - Google sign-in in the API: authorization code flow with PKCE, registered emails only, sessions in an httpOnly cookie backed by a `sessions` table, and `/api/v1/auth` endpoints for sign-in, the current user and sign-out.
 - Origin check on every state-changing request.
 - Login page on the public site with a message for each sign-in failure.
+- Templates in the API: `templates` and `template_slides` tables, read endpoints scoped to the churches a user manages, and a seeded "Liturgi Umum" template for GKJ Sentolo.
 - `pnpm check` runs lint, type-check, tests and builds together.
 - Session gate in the admin panel: pages show only to a signed-in user, with a header for navigation, the user and sign-out, and a home page listing the churches they manage.
 
