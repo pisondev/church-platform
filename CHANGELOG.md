@@ -16,6 +16,7 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 ### Changed
 
+- Section slides stand on the backdrop of the bumper, with the title in navy running into blue, a short rule under it and a brief entrance of title, rule and direction.
 - The cover of a church with a logo shows its title, a date line and its footer through the bumper. Its subtitle is not shown.
 - Seeded cover of "Liturgi Umum": the title is "Ibadah Minggu ke-{n}", the welcome line moved to the subtitle, and "silent" in the footer is marked for italics. A database seeded earlier keeps its old cover.
 - Template editor layout: the header is one thin row, and the slides moved from a strip along the bottom to a numbered panel on the left that can be closed and reopened.

@@ -171,6 +171,10 @@ The bumper and its backdrop play on the stage and in the slideshow. The slide pa
 
 The motion is in `apps/admin/src/features/templates/bumper.tsx`, with every timing and size at the top of the file, the backdrop in `backdrop.tsx` and the date in `service-date.ts`. It runs on the Web Animations API, so it does not depend on a stylesheet, and it plays even when the system asks for reduced motion, because it is content like a video. Logos ship with the app for now, in `apps/admin/public/logos`, listed by church slug in `church-logo.ts`: the emblem that the bumper brings in, and the wordmark that spells the name of the church. Churches cannot upload their own yet.
 
+### Section slides
+
+A section slide names a part of the service, with an optional line of direction under it. It stands on the same backdrop as the cover and wears the same colors: the title in navy running into blue, a short rule, the direction in a neutral dark. On the stage and in the slideshow the three come in one after the other, within a second. The slide panel shows the slide at rest. The slide is in `apps/admin/src/features/templates/section.tsx`.
+
 The editor can rename a template so far. Adding, changing, moving and removing slides is not built yet, and neither are weekly presentations. The first template, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`.
 
 ## Songs and slides

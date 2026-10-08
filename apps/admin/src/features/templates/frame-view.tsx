@@ -8,6 +8,7 @@ import { Backdrop } from "./backdrop";
 import { BAND_HEIGHT, Bumper } from "./bumper";
 import { churchLogos } from "./church-logo";
 import { emphasize } from "./emphasis";
+import { Section } from "./section";
 import { coverTitle, serviceDateLine, upcomingSunday } from "./service-date";
 import type { Church, Frame, ReadingLine, TemplateSlide } from "./types";
 
@@ -22,17 +23,6 @@ const ROLE_COLORS: Record<string, string> = {
   M: "#1e3a8a",
   "P+J": "#6b21a8",
 };
-
-function Heading({ title, subtitle }: { title?: string; subtitle?: string }) {
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-[2.4cqw] px-[7cqw] text-center">
-      <p className="text-[5.6cqw] leading-tight font-semibold text-balance">{title}</p>
-      {subtitle && (
-        <p className="text-[3cqw] leading-snug text-balance text-(--slide-muted)">{subtitle}</p>
-      )}
-    </div>
-  );
-}
 
 function Cover({ title, subtitle, footer }: { title?: string; subtitle?: string; footer?: string }) {
   return (
@@ -142,7 +132,7 @@ export function FrameView({ frame, church, live = false }: { frame: Frame; churc
   return (
     <div className="slide-frame">
       {slide.kind === "cover" && <CoverFrame content={slide.content} church={church} live={live} />}
-      {slide.kind === "section" && <Heading {...slide.content} />}
+      {slide.kind === "section" && <Section {...slide.content} live={live} />}
       {(slide.kind === "song" || slide.kind === "scripture") && <Slot kind={slide.kind} />}
       {slide.kind === "responsive_reading" && (
         <Reading
