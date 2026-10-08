@@ -68,6 +68,17 @@ test("a still bumper shows the logo, the title, the date and the notice, and nev
   expect(animate).not.toHaveBeenCalled();
 });
 
+test("the notice carries a phone icon and sits at the bottom, with the rest lifted above the middle", () => {
+  const { logo } = renderBumper(false);
+  const notice = screen.getByText(NOTICE).parentElement as HTMLElement;
+  const lockup = logo.parentElement?.parentElement as HTMLElement;
+
+  expect(notice.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  expect(notice.style.backdropFilter).toContain("blur(");
+  expect((notice.parentElement as HTMLElement).style.bottom).not.toBe("");
+  expect(lockup.style.marginBottom).not.toBe("");
+});
+
 test("a live bumper stays empty until the logo has loaded, then plays every part without end", () => {
   const { logo, scene } = renderBumper(true);
   expect(animate).not.toHaveBeenCalled();
@@ -96,6 +107,7 @@ test("without a notice nothing moves up and no room is kept for one", () => {
   fireEvent.load(logo);
 
   expect(screen.queryByText(NOTICE)).not.toBeInTheDocument();
+  expect((logo.parentElement?.parentElement as HTMLElement).style.marginBottom).toBe("");
   expect(animate).toHaveBeenCalledTimes(6);
   expect(played().get(logo.parentElement?.parentElement)).toEqual(lockupKeyframes(false));
   expect(lockupKeyframes(false).every((frame) => numbers(frame)[1] === 0)).toBe(true);

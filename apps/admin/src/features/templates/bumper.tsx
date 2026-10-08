@@ -1,5 +1,6 @@
 "use client";
 
+import { Smartphone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { type CSSProperties, type RefObject, useLayoutEffect, useRef } from "react";
 
@@ -12,7 +13,8 @@ import { type CSSProperties, type RefObject, useLayoutEffect, useRef } from "rea
 //   2. It glides to the left, shrinking a little, and uncovers the title, which comes
 //      out from behind it.
 //   3. The date line appears under the title, moving in from the left.
-//   4. With a notice: everything moves up and the notice fades in below, on glass.
+//   4. With a notice: everything moves up and the notice fades in near the bottom edge,
+//      on frosted glass.
 //   5. Everything rests, fades out, and the frame is empty for a moment.
 
 export const LOOP_MS = 14000;
@@ -41,8 +43,10 @@ const TITLE_SIZE = 5.2;
 // The title and the date line are sized by the golden ratio.
 const PHI = (1 + Math.sqrt(5)) / 2;
 const DATE_SIZE = TITLE_SIZE / PHI;
-// Room kept under the logo and the text for the notice. They move up by half of it.
-const NOTICE_ROOM = 12;
+// With a notice the logo and the text move up by this much, and the notice sits this far
+// from the bottom edge.
+const RAISE = 5;
+const NOTICE_BOTTOM = 4.5;
 
 const cqw = (value: number) => `${value}cqw`;
 
@@ -80,10 +84,11 @@ export const SPIN_KEYFRAMES: Keyframe[] = [
 
 // The logo and the text rest side by side, centered as one group. Moving the group right
 // by half the width of its text puts the logo in the middle of the frame; that is where
-// it lands, and from there it glides to its place. With a notice the group also starts
-// lower, in the middle of the frame, and moves up once the text is complete.
+// it lands, and from there it glides to its place. With a notice the group rests above
+// the middle: it starts lower, in the middle of the frame, and moves up once the text is
+// complete.
 export function lockupKeyframes(withNotice: boolean): Keyframe[] {
-  const low = withNotice ? cqw(NOTICE_ROOM / 2) : "0cqw";
+  const low = withNotice ? cqw(RAISE) : "0cqw";
   const centered = `translate(50%, ${low})`;
   const beside = `translate(0%, ${low})`;
   const raised = "translate(0%, 0cqw)";
@@ -117,7 +122,7 @@ export const DATE_KEYFRAMES: Keyframe[] = [
   { offset: 1, opacity: 1, transform: "translateX(0cqw)" },
 ];
 
-// The notice only fades in, as the room for it opens.
+// The notice only fades in, as the group above it finishes moving up.
 export const NOTICE_KEYFRAMES: Keyframe[] = [
   { offset: 0, opacity: 0 },
   { offset: at(NOTICE_AT_MS), opacity: 0, easing: "ease-out" },
@@ -135,6 +140,8 @@ export const SCENE_KEYFRAMES: Keyframe[] = [
 
 // The group leaves room for the logo on its left and is as wide as its text.
 const LOCKUP_STYLE: CSSProperties = { marginLeft: cqw(LOGO_SIZE), height: cqw(LOGO_SIZE) };
+// A margin under a centered group lifts it by half of that margin.
+const RAISED_LOCKUP_STYLE: CSSProperties = { ...LOCKUP_STYLE, marginBottom: cqw(2 * RAISE) };
 
 // The perspective travels with the logo, so the turn looks the same at every height. The
 // shadow is cast by what is visible of the logo, so it narrows as the logo turns.
@@ -162,29 +169,24 @@ const gradientText = (from: string, to: string, size: number): CSSProperties => 
 const TITLE_STYLE = gradientText("#0a1f5c", "#1d4ed8", TITLE_SIZE);
 const DATE_STYLE = gradientText("#064e3b", "#0f766e", DATE_SIZE);
 
-// The notice sits on frosted glass: a rounded sheet that blurs what is behind it. On a
-// plain white frame there is nothing to blur, so a soft glow in the two text colors lies
-// under the glass and gives it something to show.
-const NOTICE_ROOM_STYLE: CSSProperties = { height: cqw(NOTICE_ROOM) };
-const GLOW_STYLE: CSSProperties = {
-  inset: `${cqw(0.6)} ${cqw(4)}`,
-  borderRadius: cqw(3),
-  background: "linear-gradient(90deg, rgb(29 78 216 / 0.55), rgb(15 118 110 / 0.55))",
-  filter: `blur(${cqw(1.6)})`,
-};
-const GLASS_BLUR = `blur(${cqw(1.4)})`;
+// The notice sits on frosted glass: a rounded sheet, barely tinted, that blurs whatever is
+// behind it. Its text and icon are a neutral dark, apart from the colors of the title.
+const NOTICE_PLACE_STYLE: CSSProperties = { bottom: cqw(NOTICE_BOTTOM) };
+const GLASS_BLUR = `blur(${cqw(1.6)}) saturate(1.4)`;
 const GLASS_STYLE: CSSProperties = {
-  maxWidth: cqw(76),
-  padding: `${cqw(1.3)} ${cqw(3.2)}`,
+  maxWidth: cqw(80),
+  gap: cqw(1.2),
+  padding: `${cqw(1.1)} ${cqw(2.6)} ${cqw(1.1)} ${cqw(2.2)}`,
   borderRadius: cqw(1.6),
   fontSize: cqw(2.5),
-  color: "#0a1f5c",
-  background: "linear-gradient(135deg, rgb(255 255 255 / 0.82), rgb(255 255 255 / 0.62))",
-  border: `${cqw(0.12)} solid rgb(255 255 255 / 0.9)`,
-  boxShadow: `0 ${cqw(0.6)} ${cqw(2)} rgb(15 23 42 / 0.16)`,
+  color: "#0f172a",
+  background: "rgb(255 255 255 / 0.45)",
+  border: `${cqw(0.1)} solid rgb(15 23 42 / 0.1)`,
+  boxShadow: `0 ${cqw(0.5)} ${cqw(1.8)} rgb(15 23 42 / 0.12), inset 0 ${cqw(0.1)} 0 rgb(255 255 255 / 0.9)`,
   backdropFilter: GLASS_BLUR,
   WebkitBackdropFilter: GLASS_BLUR,
 };
+const NOTICE_ICON_STYLE: CSSProperties = { width: cqw(3), height: cqw(3) };
 
 export function Bumper({
   logo,
@@ -210,7 +212,7 @@ export function Bumper({
   const spin = useRef<HTMLImageElement>(null);
   const heading = useRef<HTMLParagraphElement>(null);
   const dateLine = useRef<HTMLParagraphElement>(null);
-  const warning = useRef<HTMLDivElement>(null);
+  const warning = useRef<HTMLParagraphElement>(null);
 
   useLayoutEffect(() => {
     const frame = scene.current;
@@ -256,8 +258,8 @@ export function Bumper({
   }, [live, logo, withNotice]);
 
   return (
-    <div ref={scene} className="flex h-full flex-col items-center justify-center">
-      <div ref={lockup} className="relative" style={LOCKUP_STYLE}>
+    <div ref={scene} className="relative flex h-full items-center justify-center">
+      <div ref={lockup} className="relative" style={notice ? RAISED_LOCKUP_STYLE : LOCKUP_STYLE}>
         <div ref={lift} className="absolute inset-y-0 right-full flex items-center" style={LIFT_STYLE}>
           {/* A plain img: the file is already sized for the slide, and the animation needs the element. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -287,13 +289,11 @@ export function Bumper({
       </div>
 
       {notice && (
-        <div className="flex items-end" style={NOTICE_ROOM_STYLE}>
-          <div ref={warning} className="relative">
-            <div aria-hidden className="absolute" style={GLOW_STYLE} />
-            <p className="relative text-center leading-snug font-semibold text-balance" style={GLASS_STYLE}>
-              {notice}
-            </p>
-          </div>
+        <div className="absolute inset-x-0 flex justify-center" style={NOTICE_PLACE_STYLE}>
+          <p ref={warning} className="flex items-center leading-snug font-semibold" style={GLASS_STYLE}>
+            <Smartphone aria-hidden className="shrink-0" style={NOTICE_ICON_STYLE} />
+            <span className="text-balance">{notice}</span>
+          </p>
         </div>
       )}
     </div>

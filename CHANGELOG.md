@@ -6,7 +6,7 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 ### Added
 
-- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; everything moves up and the footer fades in as a notice on frosted glass. It plays on the stage and in the slideshow, and stands still in the slide panel.
+- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; everything moves up and the footer fades in near the bottom edge as a notice with a phone icon on frosted glass. It plays on the stage and in the slideshow, and stands still in the slide panel.
 - `{n}` in a cover title stands for which Sunday of the month the service falls on.
 - Covers are dated for the coming Sunday, in Indonesian, until presentations carry their own date.
 - The GKJ Sentolo logo as an app asset, `apps/admin/public/logos/gkj-sentolo.webp`.
