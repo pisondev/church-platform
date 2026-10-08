@@ -39,6 +39,8 @@ test("the cover of a church with a logo is a bumper: logo, numbered title, date 
   expect(container.querySelector(".slide-frame [aria-hidden=true] svg path")).toBeInTheDocument();
 
   expect(screen.getByRole("img", { name: "GKJ Sentolo logo" })).toHaveAttribute("src", "/logos/gkj-sentolo.webp");
+  // The wordmark of the church stands beside the notice.
+  expect(screen.getByRole("img", { name: "GKJ Sentolo" })).toHaveAttribute("src", "/logos/gkj-sentolo-wordmark.webp");
   expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();
   expect(screen.getByText("Minggu, 11 Oktober 2026")).toBeInTheDocument();
   expect(screen.getByText(/^Handphone mohon dimatikan atau/)).toBeInTheDocument();

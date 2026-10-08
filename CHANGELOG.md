@@ -6,12 +6,12 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 ### Added
 
-- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; a band of frosted glass rises from the bottom edge, carrying the footer as a notice next to a phone under a red "not allowed" sign, and everything above moves up to make room. It plays on the stage and in the slideshow, and stands still in the slide panel.
-- Backdrop behind the bumper: a bright frame with a breath of sky at the top and slow waves of light blue along the bottom, moving on their own.
+- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; a band of frosted glass rises from the bottom edge, carrying the wordmark of the church on the left and the footer as a notice on the right, next to a phone under a red "not allowed" sign. Everything above moves up to make room, and so does the water of the backdrop. It plays on the stage and in the slideshow, and stands still in the slide panel.
+- Backdrop behind the bumper: a bright frame with a breath of sky at the top, a kawung batik pattern in the top corners, slow waves of light blue along the bottom and motes of light drifting up, all moving on their own.
 - `{n}` in a cover title stands for which Sunday of the month the service falls on.
 - Text between asterisks in a cover footer is set in italics, for words in another language.
 - Covers are dated for the coming Sunday, in Indonesian, until presentations carry their own date.
-- The GKJ Sentolo logo as an app asset, `apps/admin/public/logos/gkj-sentolo.webp`.
+- The GKJ Sentolo emblem and wordmark as app assets, `apps/admin/public/logos/gkj-sentolo.webp` and `gkj-sentolo-wordmark.webp`.
 
 ### Changed
 

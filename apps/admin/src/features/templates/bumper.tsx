@@ -16,7 +16,8 @@ import { emphasize } from "./emphasis";
 //      out from behind it.
 //   3. The date line appears under the title, moving in from the left.
 //   4. With a notice: a band of frosted glass rises from the bottom edge, carrying the
-//      notice, and everything moves up to make room for it.
+//      wordmark of the church and the notice. Everything moves up to make room for it,
+//      and so does the water of the backdrop.
 //   5. Everything rests, fades out, and the frame is empty for a moment.
 
 export const LOOP_MS = 14000;
@@ -45,7 +46,7 @@ const PHI = (1 + Math.sqrt(5)) / 2;
 const DATE_SIZE = TITLE_SIZE / PHI;
 // The height of the band along the bottom that carries the notice. The logo and the text
 // rest in the middle of what is left above it, so they move up by half of it.
-const BAND_HEIGHT = 9;
+export const BAND_HEIGHT = 10;
 
 const cqw = (value: number) => `${value}cqw`;
 
@@ -130,6 +131,17 @@ export const BAND_KEYFRAMES: Keyframe[] = [
   { offset: 1, transform: "translateY(0%)" },
 ];
 
+// The water of the backdrop rises with the band, so it stays in sight above it, and sinks
+// back while the round ends.
+const WATER_LIFTED = `translateY(${cqw(-BAND_HEIGHT)})`;
+export const WATER_KEYFRAMES: Keyframe[] = [
+  { offset: 0, transform: "translateY(0cqw)" },
+  { offset: at(RAISE_AT_MS), transform: "translateY(0cqw)", easing: GLIDE },
+  { offset: at(RAISE_AT_MS + RAISE_MS), transform: WATER_LIFTED },
+  { offset: at(FADE_AT_MS), transform: WATER_LIFTED, easing: SOFT },
+  { offset: 1, transform: "translateY(0cqw)" },
+];
+
 // Each round ends on an empty frame, so the next one starts clean.
 export const SCENE_KEYFRAMES: Keyframe[] = [
   { offset: 0, opacity: 1 },
@@ -167,14 +179,14 @@ const gradientText = (from: string, to: string, size: number): CSSProperties => 
 const TITLE_STYLE = gradientText("#0a1f5c", "#1d4ed8", TITLE_SIZE);
 const DATE_STYLE = gradientText("#064e3b", "#0f766e", DATE_SIZE);
 
-// The notice sits on a band of frosted glass that spans the frame from edge to edge and
-// reaches its bottom. The band is a thin white film that blurs whatever is behind it.
-// Text and phone are a neutral dark, apart from the colors of the title.
+// The band of frosted glass spans the frame from edge to edge and reaches its bottom. It
+// is a thin white film that blurs whatever is behind it. It has two parts: the wordmark
+// of the church on the left, the notice on the right. Text and phone are a neutral dark,
+// apart from the colors of the title.
 const BAND_BLUR = `blur(${cqw(1.6)}) saturate(1.4)`;
 const BAND_STYLE: CSSProperties = {
   height: cqw(BAND_HEIGHT),
-  gap: cqw(1.4),
-  padding: `0 ${cqw(5)}`,
+  padding: `0 ${cqw(4)}`,
   fontSize: cqw(2.6),
   color: "#0f172a",
   background: "rgb(255 255 255 / 0.5)",
@@ -183,6 +195,14 @@ const BAND_STYLE: CSSProperties = {
   backdropFilter: BAND_BLUR,
   WebkitBackdropFilter: BAND_BLUR,
 };
+const WORDMARK_STYLE: CSSProperties = { height: cqw(7) };
+const DIVIDER_STYLE: CSSProperties = {
+  width: cqw(0.12),
+  height: cqw(5.6),
+  margin: `0 ${cqw(3.2)}`,
+  background: "rgb(15 23 42 / 0.22)",
+};
+const NOTICE_STYLE: CSSProperties = { gap: cqw(1.4) };
 // A phone under a larger red "not allowed" sign.
 const SIGN_SIZE = 4.8;
 const SIGN_STYLE: CSSProperties = { width: cqw(SIGN_SIZE), height: cqw(SIGN_SIZE) };
@@ -191,18 +211,24 @@ const BAN_STYLE: CSSProperties = { color: "#dc2626" };
 
 export function Bumper({
   logo,
+  wordmark,
   church,
   title,
   date,
   notice,
   live,
+  water,
 }: {
   logo: string;
+  // The logo that spells the name of the church, shown beside the notice.
+  wordmark?: string;
   church: string;
   title?: string;
   date: string;
   notice?: string;
   live: boolean;
+  // The water of the backdrop, which rises with the band.
+  water?: RefObject<HTMLElement | null>;
 }) {
   const t = useTranslations("Templates");
   const withNotice = Boolean(notice);
@@ -213,7 +239,7 @@ export function Bumper({
   const spin = useRef<HTMLImageElement>(null);
   const heading = useRef<HTMLParagraphElement>(null);
   const dateLine = useRef<HTMLParagraphElement>(null);
-  const warning = useRef<HTMLParagraphElement>(null);
+  const warning = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const frame = scene.current;
@@ -230,6 +256,7 @@ export function Bumper({
       [dateLine, DATE_KEYFRAMES],
       [warning, BAND_KEYFRAMES],
     ];
+    if (withNotice && water) parts.push([water, WATER_KEYFRAMES]);
     let running: Animation[] = [];
     const show = () => {
       frame.style.visibility = "";
@@ -256,7 +283,7 @@ export function Bumper({
       for (const animation of running) animation.cancel();
       show();
     };
-  }, [live, logo, withNotice]);
+  }, [live, logo, withNotice, water]);
 
   return (
     <div ref={scene} className="flex h-full flex-col">
@@ -292,17 +319,22 @@ export function Bumper({
       </div>
 
       {notice && (
-        <p
-          ref={warning}
-          className="flex shrink-0 items-center justify-center leading-snug font-semibold"
-          style={BAND_STYLE}
-        >
-          <span className="relative flex shrink-0 items-center justify-center" style={SIGN_STYLE}>
-            <Smartphone aria-hidden style={PHONE_STYLE} />
-            <Ban aria-hidden className="absolute inset-0 size-full" style={BAN_STYLE} />
-          </span>
-          <span className="text-balance">{emphasize(notice)}</span>
-        </p>
+        <div ref={warning} className="flex shrink-0 items-center leading-snug font-semibold" style={BAND_STYLE}>
+          {wordmark && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={wordmark} alt={church} draggable={false} className="w-auto shrink-0 select-none" style={WORDMARK_STYLE} />
+              <span aria-hidden className="shrink-0" style={DIVIDER_STYLE} />
+            </>
+          )}
+          <p className="flex min-w-0 flex-1 items-center justify-center" style={NOTICE_STYLE}>
+            <span className="relative flex shrink-0 items-center justify-center" style={SIGN_STYLE}>
+              <Smartphone aria-hidden style={PHONE_STYLE} />
+              <Ban aria-hidden className="absolute inset-0 size-full" style={BAN_STYLE} />
+            </span>
+            <span className="text-balance">{emphasize(notice)}</span>
+          </p>
+        </div>
       )}
     </div>
   );

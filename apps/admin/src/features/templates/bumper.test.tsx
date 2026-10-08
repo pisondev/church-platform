@@ -1,9 +1,11 @@
 import { fireEvent, screen } from "@testing-library/react";
+import { createRef } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import { renderWithMessages } from "@/test-utils";
 
 import {
+  BAND_HEIGHT,
   BAND_KEYFRAMES,
   Bumper,
   DATE_KEYFRAMES,
@@ -12,6 +14,7 @@ import {
   SCENE_KEYFRAMES,
   SPIN_KEYFRAMES,
   TITLE_KEYFRAMES,
+  WATER_KEYFRAMES,
   lockupKeyframes,
 } from "./bumper";
 
@@ -34,18 +37,30 @@ const NOTICE = "Handphone mohon dimatikan atau *silent*";
 // The band along the bottom that carries the notice. Its text is split around the word in
 // italics, so it is found by the part before that word.
 const noticeText = () => screen.queryByText(/^Handphone mohon dimatikan atau/);
-const band = () => noticeText()?.parentElement as HTMLElement;
+const band = () => noticeText()?.closest("div") as HTMLElement;
 
-function renderBumper(live: boolean, notice: string | undefined = NOTICE) {
+// What stands in for the water of the backdrop, which the bumper lifts with its band.
+const water = createRef<HTMLDivElement>();
+
+function renderBumper(
+  live: boolean,
+  notice: string | undefined = NOTICE,
+  wordmark: string | undefined = "/logos/church-wordmark.webp",
+) {
   const view = renderWithMessages(
-    <Bumper
-      logo="/logos/church.webp"
-      church="GKJ Sentolo"
-      title="Ibadah Minggu ke-2"
-      date="Minggu, 11 Oktober 2026"
-      notice={notice}
-      live={live}
-    />,
+    <>
+      <Bumper
+        logo="/logos/church.webp"
+        wordmark={wordmark}
+        church="GKJ Sentolo"
+        title="Ibadah Minggu ke-2"
+        date="Minggu, 11 Oktober 2026"
+        notice={notice}
+        live={live}
+        water={water}
+      />
+      <div ref={water} />
+    </>,
   );
   // By its alt text: a live bumper is hidden until its logo has loaded, and a hidden
   // image has no accessible name to find it by.
@@ -85,6 +100,26 @@ test("the notice is on a band of frosted glass, the last thing in the frame and 
   expect(band().style.borderRadius).toBe("");
 });
 
+test("the band has two parts: the wordmark of the church on the left, the notice on the right", () => {
+  renderBumper(false);
+  const wordmark = screen.getByRole("img", { name: "GKJ Sentolo" });
+  const [first, divider, last] = [...band().children];
+
+  expect(first).toBe(wordmark);
+  expect(wordmark).toHaveAttribute("src", "/logos/church-wordmark.webp");
+  expect(divider).toHaveAttribute("aria-hidden", "true");
+  expect(last).toBe(noticeText()?.parentElement);
+  // The notice takes the room that is left and stands in the middle of it.
+  expect(last).toHaveClass("flex-1", "justify-center");
+});
+
+test("without a wordmark the notice has the band to itself", () => {
+  renderBumper(false, NOTICE, "");
+
+  expect(screen.queryByRole("img", { name: "GKJ Sentolo" })).not.toBeInTheDocument();
+  expect([...band().children]).toEqual([noticeText()?.parentElement]);
+});
+
 test("the phone on the notice is under a larger red sign", () => {
   renderBumper(false);
   const [phone, sign] = band().querySelectorAll("svg");
@@ -113,7 +148,7 @@ test("a live bumper stays empty until the logo has loaded, then plays every part
   fireEvent.load(logo);
 
   expect(scene.style.visibility).toBe("");
-  expect(animate).toHaveBeenCalledTimes(7);
+  expect(animate).toHaveBeenCalledTimes(8);
   for (const [, timing] of animate.mock.calls as unknown as [Keyframe[], KeyframeAnimationOptions][]) {
     expect(timing).toEqual({ duration: LOOP_MS, iterations: Infinity });
   }
@@ -126,6 +161,7 @@ test("a live bumper stays empty until the logo has loaded, then plays every part
   expect(parts.get(screen.getByText("Ibadah Minggu ke-2"))).toBe(TITLE_KEYFRAMES);
   expect(parts.get(screen.getByText("Minggu, 11 Oktober 2026"))).toBe(DATE_KEYFRAMES);
   expect(parts.get(band())).toBe(BAND_KEYFRAMES);
+  expect(parts.get(water.current)).toBe(WATER_KEYFRAMES);
 });
 
 test("without a notice nothing moves up and no room is kept for one", () => {
@@ -134,6 +170,8 @@ test("without a notice nothing moves up and no room is kept for one", () => {
 
   expect(noticeText()).not.toBeInTheDocument();
   expect(animate).toHaveBeenCalledTimes(6);
+  // No band, so the water stays where it is.
+  expect(played().has(water.current)).toBe(false);
   expect(played().get(logo.parentElement?.parentElement)).toEqual(lockupKeyframes(false));
   expect(lockupKeyframes(false).every((frame) => numbers(frame)[1] === 0)).toBe(true);
 });
@@ -144,7 +182,7 @@ test("the motion stops when the slide goes away", () => {
 
   unmount();
 
-  expect(cancel).toHaveBeenCalledTimes(7);
+  expect(cancel).toHaveBeenCalledTimes(8);
 });
 
 test("a logo that fails to load leaves the bumper showing as it rests", () => {
@@ -255,6 +293,22 @@ test("once the text is complete the band rises from the bottom edge and everythi
   expect(below.easing).toBe(low.easing);
   // It rises; it does not fade.
   expect(BAND_KEYFRAMES.every((frame) => frame.opacity === undefined)).toBe(true);
+});
+
+test("the water rises with the band, as high as the band, and sinks back while the round ends", () => {
+  const [, low, lifted, held, back] = WATER_KEYFRAMES;
+  const [, below, risen] = BAND_KEYFRAMES;
+
+  expect([offsetOf(low), offsetOf(lifted)]).toEqual([offsetOf(below), offsetOf(risen)]);
+  expect(low.easing).toBe(below.easing);
+  expect(numbers(low)[0]).toBe(0);
+  expect(numbers(lifted)[0]).toBe(-BAND_HEIGHT);
+  // It stays up until the bumper starts to fade, then goes down smoothly, not in a jump.
+  expect(numbers(held)[0]).toBe(-BAND_HEIGHT);
+  expect(offsetOf(held)).toBe(offsetOf(SCENE_KEYFRAMES.findLast((frame) => frame.opacity === 1)!));
+  expect(offsetOf(back)).toBe(1);
+  expect(numbers(back)[0]).toBe(0);
+  expect(numbers(WATER_KEYFRAMES[0])[0]).toBe(0);
 });
 
 test("each round ends on an empty frame, so the next one starts clean", () => {

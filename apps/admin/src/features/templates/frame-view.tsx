@@ -2,11 +2,11 @@
 
 import { BookOpen, Music } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Backdrop } from "./backdrop";
-import { Bumper } from "./bumper";
-import { churchLogo } from "./church-logo";
+import { BAND_HEIGHT, Bumper } from "./bumper";
+import { churchLogos } from "./church-logo";
 import { emphasize } from "./emphasis";
 import { coverTitle, serviceDateLine, upcomingSunday } from "./service-date";
 import type { Church, Frame, ReadingLine, TemplateSlide } from "./types";
@@ -109,21 +109,25 @@ function CoverFrame({
   // A template has no date yet, so the cover is dated for the coming Sunday.
   const [sunday] = useState(() => upcomingSunday(new Date()));
   const title = content.title && coverTitle(content.title, sunday);
-  const logo = church && churchLogo(church.slug);
+  const logos = church && churchLogos(church.slug);
+  // The bumper raises the water of the backdrop in time with its band.
+  const water = useRef<HTMLDivElement>(null);
 
-  if (!logo) return <Cover {...content} title={title} />;
+  if (!logos) return <Cover {...content} title={title} />;
 
   return (
     <div className="relative h-full">
-      <Backdrop live={live} />
+      <Backdrop live={live} lift={content.footer ? BAND_HEIGHT : 0} water={water} />
       <div className="relative h-full">
         <Bumper
-          logo={logo}
+          logo={logos.emblem}
+          wordmark={logos.wordmark}
           church={church.name}
           title={title}
           date={serviceDateLine(sunday)}
           notice={content.footer}
           live={live}
+          water={water}
         />
       </div>
     </div>
