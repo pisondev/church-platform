@@ -1,26 +1,17 @@
 // Tests for .githooks/commit-msg. Run with `pnpm test:hooks`.
 import assert from "node:assert/strict";
-import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { after, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { findShell } from "./shell.mjs";
+
 const hook = resolve(dirname(fileURLToPath(import.meta.url)), "../.githooks/commit-msg");
 const workDir = mkdtempSync(join(tmpdir(), "commit-msg-"));
 after(() => rmSync(workDir, { recursive: true, force: true }));
-
-// Git for Windows ships sh but does not always put it on PATH.
-function findShell() {
-  if (spawnSync("sh", ["-c", "exit 0"]).status === 0) return "sh";
-  const execPath = execFileSync("git", ["--exec-path"], { encoding: "utf8" }).trim();
-  for (const candidate of ["../../../bin/sh.exe", "../../../usr/bin/sh.exe"]) {
-    const shell = resolve(execPath, candidate);
-    if (existsSync(shell)) return shell;
-  }
-  throw new Error("sh not found");
-}
 
 const shell = findShell();
 let counter = 0;

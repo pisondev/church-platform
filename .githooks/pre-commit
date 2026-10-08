@@ -1,0 +1,6 @@
+#!/bin/sh
+# Refuses to commit files that belong to an AI coding tool.
+
+root=$(git rev-parse --show-toplevel) || exit 1
+
+git diff --cached --name-only --diff-filter=ACMR | sh "$root/scripts/check-ai-files.sh"

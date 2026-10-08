@@ -21,6 +21,7 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 - Google sign-in setup guide and the matching `.env.example` entries.
 - Cipher notation engine in the admin panel: a text format for notes and lyrics, a parser that validates syllable counts, and a renderer that draws beams, slurs, octave dots, accidentals and bar lines.
 - Song library preview with KJ 40 and PKJ 192: verse selection, slides of two phrases at most, keyboard and click navigation, and full-screen presenting.
+- `pre-commit` hook and CI check that keep AI tool files out of the repository.
 
 ### Changed
 

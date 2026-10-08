@@ -50,7 +50,7 @@ pnpm dev:admin      # admin panel on http://localhost:3101
 | `pnpm lint` | Vets the Go code and runs ESLint on both frontends |
 | `pnpm typecheck` | Type-checks both frontends |
 | `pnpm test` | Runs every unit test |
-| `pnpm test:hooks` | Tests the commit message hook |
+| `pnpm test:hooks` | Tests the git hooks |
 | `pnpm test:api` | Runs the API tests; database tests are skipped |
 | `pnpm test:api:db` | Runs the API tests including the database tests |
 | `pnpm build` | Builds the API binary into `apps/api/bin` and both frontends |
@@ -122,9 +122,10 @@ Two songs are built in for now, KJ 40 and PKJ 192. Sign-in, templates and stored
 `pnpm install` sets `core.hooksPath` to `.githooks`.
 
 - `commit-msg` rejects messages that attribute the work to an AI tool: `Co-Authored-By` trailers naming one, "Generated with ..." lines, vendor emails and links.
+- `pre-commit` refuses files that belong to an AI coding tool, such as assistant instruction files and their settings folders. Keep those local through `.git/info/exclude`.
 - `pre-push` runs `pnpm test` and aborts the push on failure.
 
-`scripts/check-commits.sh [<range>]` applies the same message check to existing commits. CI uses it.
+`scripts/check-commits.sh [<range>]` applies the message check to existing commits, and `git ls-files | sh scripts/check-ai-files.sh` applies the file check to everything tracked. CI runs both.
 
 ## Continuous integration
 
@@ -132,7 +133,7 @@ Two songs are built in for now, KJ 40 and PKJ 192. Sign-in, templates and stored
 
 | Job | Checks |
 | --- | --- |
-| Commit messages | Hook tests, and no AI attribution anywhere in the history |
+| Repository rules | Hook tests, no AI attribution anywhere in the history, no AI tool files tracked |
 | API | `gofmt`, `go vet`, tests against a PostgreSQL service, build |
 | Frontends | ESLint, type-check, Vitest and production build for both apps |
 

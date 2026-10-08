@@ -18,7 +18,7 @@
     "lint:api": "go -C apps/api vet ./...",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm run test:hooks && pnpm run test:api && pnpm -r --if-present test",
-    "test:hooks": "node --test scripts/commit-msg-hook.test.mjs",
+    "test:hooks": "node --test \"scripts/*.test.mjs\"",
     "test:api": "go -C apps/api test ./...",
     "test:api:db": "node scripts/test-api-db.mjs",
     "build": "pnpm run build:api && pnpm -r --if-present build",
