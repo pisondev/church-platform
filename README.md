@@ -114,6 +114,16 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 
 `scripts/check-commits.sh [<range>]` applies the same message check to existing commits. CI uses it.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and on pull requests.
+
+| Job | Checks |
+| --- | --- |
+| Commit messages | Hook tests, and no AI attribution anywhere in the history |
+| API | `gofmt`, `go vet`, tests against a PostgreSQL service, build |
+| Frontends | ESLint, type-check, Vitest and production build for both apps |
+
 ## Conventions
 
 - English for code, comments, logs, docs, commits and UI copy.
