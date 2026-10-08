@@ -2,12 +2,28 @@
   "Metadata": {
     "description": "Admin panel for church and platform administrators."
   },
+  "Nav": {
+    "home": "Home",
+    "songs": "Songs"
+  },
+  "Session": {
+    "loading": "Checking your session…",
+    "signedOutTitle": "Sign in to continue",
+    "signedOutLead": "The admin panel is open to registered church and platform administrators.",
+    "signIn": "Sign in",
+    "errorTitle": "The server could not be reached",
+    "errorLead": "Check that the API is running, then try again.",
+    "retry": "Try again",
+    "signOut": "Sign out",
+    "superAdmin": "Super Admin",
+    "churchAdmin": "Church Admin"
+  },
   "Home": {
-    "title": "Admin panel",
+    "title": "Welcome, {name}",
     "lead": "Manage churches, admins and presentations from here.",
-    "signInUnavailable": "Sign-in is not available yet.",
-    "openSongs": "Open the song library",
-    "backToSite": "Back to the public site"
+    "churchesTitle": "Churches you manage",
+    "noChurches": "No church is assigned to this account yet.",
+    "openSongs": "Open the song library"
   },
   "Songs": {
     "title": "Song library",

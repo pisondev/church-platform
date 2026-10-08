@@ -11,7 +11,7 @@ The first feature in scope is Presentation: reusable liturgy templates and the w
 | Path | Purpose |
 | --- | --- |
 | `apps/api` | HTTP API (Go, Gin, PostgreSQL) |
-| `apps/web` | Public site: landing, About, Contact, Privacy Policy and Terms of Service (Next.js, Tailwind CSS, Lucide) |
+| `apps/web` | Public site: landing, About, Contact, Privacy Policy, Terms of Service and the login page (Next.js, Tailwind CSS, Lucide) |
 | `apps/admin` | Admin panel for Super Admins and Church Admins, with the song library and slide preview (Next.js, Tailwind CSS, Lucide) |
 | `infra` | Local infrastructure files used by Docker Compose |
 | `.githooks` | Versioned git hooks |
@@ -75,8 +75,8 @@ The frontends read these at build time:
 
 | Variable | Default | Used by |
 | --- | --- | --- |
-| `NEXT_PUBLIC_ADMIN_URL` | `http://localhost:3101` | `apps/web`, for the sign-in link |
-| `NEXT_PUBLIC_WEB_URL` | `http://localhost:3100` | `apps/admin`, for the link back to the site |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | Both apps, to reach the API |
+| `NEXT_PUBLIC_WEB_URL` | `http://localhost:3100` | `apps/admin`, to send signed-out visitors to the login page |
 
 ## Database
 
@@ -119,6 +119,7 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 - **Product identity.** The name, tagline, operator and contact email live in `src/config/site.ts` of each app. Change them there only.
 - **Legal text.** The Privacy Policy and Terms of Service are English only and live in `apps/web/src/content`. They are drafts until reviewed.
 - **Copy.** UI text lives in `messages/en.json` and is read through [next-intl](https://next-intl.dev). Keys are type-checked. To add a language, add its code to `src/i18n/config.ts`, add `messages/<code>.json`, and resolve the locale in `src/i18n/request.ts`.
+- **Sign-in.** The login page is `/login` on the public site and hands over to the API. The admin panel wraps every page in `SessionGate`, which asks the API for the session and shows the app only to a signed-in user. The API is what enforces access; the gate is the front door.
 - **Theme.** Light only, and slides are dark text on white, because weak projectors wash out dark screens. Colors are CSS variables in each app's `globals.css`, so a dark theme can be added later by overriding them.
 - **Tests.** Vitest with Testing Library. `renderWithMessages` in `src/test-utils.tsx` renders a component with the English messages.
 
@@ -128,7 +129,7 @@ The admin panel has a song library at `/songs`. Each song is stored as text and 
 
 A song page lets you choose verses and previews the slides: a title slide, then two phrases per slide at most. The slideshow moves with the arrow keys, Page Up, Page Down, Space, Home, End or a click, and Present opens it full screen.
 
-Two songs are built in for now, KJ 40 and PKJ 192. Sign-in, templates and stored presentations are not built yet.
+Two songs are built in for now, KJ 40 and PKJ 192. Templates and stored presentations are not built yet.
 
 ## Git hooks
 

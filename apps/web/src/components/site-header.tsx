@@ -21,13 +21,13 @@ export function SiteHeader() {
           <Link href="/contact" className="text-muted hover:text-foreground">
             {t("contact")}
           </Link>
-          <a
-            href={siteConfig.adminUrl}
+          <Link
+            href="/login"
             className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 font-medium text-accent-foreground transition-opacity hover:opacity-90"
           >
             <LogIn aria-hidden className="size-4" />
             {t("signIn")}
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

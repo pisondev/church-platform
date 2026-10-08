@@ -16,13 +16,10 @@ test("header links the brand home and the public pages", () => {
   expect(header.getByRole("link", { name: messages.Nav.contact })).toHaveAttribute("href", "/contact");
 });
 
-test("header sends sign in to the admin app", () => {
+test("header sends sign in to the login page", () => {
   renderWithMessages(<SiteHeader />);
 
-  expect(screen.getByRole("link", { name: messages.Nav.signIn })).toHaveAttribute(
-    "href",
-    siteConfig.adminUrl,
-  );
+  expect(screen.getByRole("link", { name: messages.Nav.signIn })).toHaveAttribute("href", "/login");
 });
 
 test("footer links the legal pages", () => {

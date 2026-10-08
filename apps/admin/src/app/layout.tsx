@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { siteConfig } from "@/config/site";
+import { SessionGate } from "@/features/session/session-gate";
 
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <SessionGate>{children}</SessionGate>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

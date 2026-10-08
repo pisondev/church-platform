@@ -41,6 +41,23 @@
     "lead": "Questions, feedback, or a request to delete your data: send an email and you will get a reply.",
     "emailLabel": "Email"
   },
+  "Login": {
+    "title": "Sign in",
+    "lead": "The admin panel is open to registered church and platform administrators.",
+    "google": "Continue with Google",
+    "legal": "By signing in you agree to the Terms of Service and the Privacy Policy.",
+    "errors": {
+      "access_denied": "Sign-in was cancelled. Try again when you are ready.",
+      "invalid_state": "The sign-in attempt expired. Start again.",
+      "exchange_failed": "Google could not confirm the sign-in. Try again.",
+      "unverified_email": "This Google account has no verified email address.",
+      "not_registered": "This email is not registered. Ask your administrator to add it.",
+      "suspended": "This account is suspended. Contact your administrator.",
+      "account_mismatch": "This email is linked to a different Google account. Contact your administrator.",
+      "server_error": "Something went wrong on our side. Try again in a moment.",
+      "unknown": "Sign-in failed. Try again."
+    }
+  },
   "Legal": {
     "effective": "Effective {date}"
   },

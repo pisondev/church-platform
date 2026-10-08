@@ -7,5 +7,5 @@ export const siteConfig = {
   tagline: "a service for your Ecclesia (a.k.a Church)",
   operator: "Pison Golda",
   contactEmail: "pison.gm.dev@gmail.com",
-  adminUrl: process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3101",
+  apiUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",
 } as const;
