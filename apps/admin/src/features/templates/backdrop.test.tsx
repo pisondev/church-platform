@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
-import { Backdrop, DRIFT_KEYFRAMES, KAWUNG_TILE, MOTES, WATER_DEPTH, WAVES, moteKeyframes } from "./backdrop";
+import { Backdrop, DRIFT_KEYFRAMES, KAWUNG_TILE, WATER_DEPTH, WAVES } from "./backdrop";
 
 // jsdom has no Web Animations API, so the tests supply the one method the backdrop uses.
 const cancel = vi.fn();
@@ -29,7 +29,6 @@ function renderBackdrop(live: boolean, lift?: number) {
     batik: layer("batik")[0],
     water: layer("water")[0],
     waves: [...layer("water")[0].children] as HTMLElement[],
-    motes: layer("mote"),
     waterRef: water,
   };
 }
@@ -37,14 +36,13 @@ function renderBackdrop(live: boolean, lift?: number) {
 type Call = [Keyframe[], KeyframeAnimationOptions];
 const calls = () => animate.mock.calls as unknown as Call[];
 
-test("the backdrop is decoration behind the whole frame: sky, batik, water and motes of light", () => {
-  const { backdrop, batik, water, waves, motes } = renderBackdrop(false);
+test("the backdrop is decoration behind the whole frame: sky, batik and water", () => {
+  const { backdrop, batik, water, waves } = renderBackdrop(false);
 
   expect(backdrop).toHaveAttribute("aria-hidden", "true");
   expect(backdrop).toHaveClass("absolute", "inset-0");
-  expect([...backdrop.children]).toEqual([batik, water, ...motes]);
+  expect([...backdrop.children]).toEqual([batik, water]);
   expect(waves).toHaveLength(WAVES.length);
-  expect(motes).toHaveLength(MOTES.length);
   for (const wave of waves) expect(wave.querySelector("svg path")).toBeInTheDocument();
 });
 
@@ -66,37 +64,35 @@ test("a still backdrop does not move", () => {
   expect(animate).not.toHaveBeenCalled();
 });
 
-test("a live backdrop moves every wave and every mote without end, each at its own pace", () => {
-  const { waves, motes } = renderBackdrop(true);
+test("a live backdrop moves every wave without end, each at its own pace", () => {
+  const { waves } = renderBackdrop(true);
 
-  expect(animate.mock.contexts).toEqual([...waves, ...motes]);
-  for (const [, timing] of calls()) {
+  expect(animate.mock.contexts).toEqual(waves);
+  for (const [keyframes, timing] of calls()) {
+    expect(keyframes).toBe(DRIFT_KEYFRAMES);
     expect(timing.iterations).toBe(Infinity);
     // No easing: a wave that slowed down and sped up would show where it repeats.
     expect(timing.easing).toBeUndefined();
   }
-
-  const waveCalls = calls().slice(0, waves.length);
-  for (const [keyframes] of waveCalls) expect(keyframes).toBe(DRIFT_KEYFRAMES);
-  expect(new Set(waveCalls.map(([, timing]) => timing.duration)).size).toBe(WAVES.length);
-  expect(new Set(waveCalls.map(([, timing]) => timing.iterationStart)).size).toBe(WAVES.length);
-  expect(waveCalls.some(([, timing]) => timing.direction === "reverse")).toBe(true);
-
-  calls()
-    .slice(waves.length)
-    .forEach(([keyframes, timing], index) => {
-      expect(keyframes).toEqual(moteKeyframes(MOTES[index]));
-      expect(timing.duration).toBe(MOTES[index].seconds * 1000);
-      expect(timing.iterationStart).toBe(MOTES[index].start);
-    });
+  expect(new Set(calls().map(([, timing]) => timing.duration)).size).toBe(WAVES.length);
+  expect(new Set(calls().map(([, timing]) => timing.iterationStart)).size).toBe(WAVES.length);
+  expect(calls().some(([, timing]) => timing.direction === "reverse")).toBe(true);
 });
 
-test("everything stops when the slide goes away", () => {
+test("the waves stop when the slide goes away", () => {
   const { unmount } = renderBackdrop(true);
 
   unmount();
 
-  expect(cancel).toHaveBeenCalledTimes(WAVES.length + MOTES.length);
+  expect(cancel).toHaveBeenCalledTimes(WAVES.length);
+});
+
+test("the waves stay light, and slow", () => {
+  for (const wave of WAVES) {
+    const [red, green, blue] = wave.color.match(/[0-9]+/g)!.map(Number);
+    expect(Math.min(red, green, blue)).toBeGreaterThanOrEqual(140);
+    expect(wave.seconds).toBeGreaterThanOrEqual(20);
+  }
 });
 
 test("a wave ends each pass on the picture it started with", () => {
@@ -132,27 +128,3 @@ test("a still backdrop shows the water lifted; a live one leaves lifting it to t
   expect(WATER_DEPTH).toBeGreaterThanOrEqual(10);
 });
 
-test("a mote comes out of nothing, drifts up and goes out again", () => {
-  for (const mote of MOTES) {
-    const frames = moteKeyframes(mote);
-    const [first, last] = [frames[0], frames.at(-1)!];
-    const [, rise] = String(last.transform).match(/-?[\d.]+(?=cqw)/g)!.map(Number);
-
-    expect(first.opacity).toBe(0);
-    expect(last.opacity).toBe(0);
-    expect(Math.max(...frames.map((frame) => Number(frame.opacity)))).toBeGreaterThan(0.5);
-    expect(rise).toBeLessThan(0);
-  }
-});
-
-test("the backdrop stays light, and slow", () => {
-  for (const wave of WAVES) {
-    const [red, green, blue] = wave.color.match(/\d+/g)!.map(Number);
-    expect(Math.min(red, green, blue)).toBeGreaterThanOrEqual(140);
-    expect(wave.seconds).toBeGreaterThanOrEqual(20);
-  }
-  for (const mote of MOTES) {
-    expect(mote.seconds).toBeGreaterThanOrEqual(12);
-    expect(mote.size).toBeLessThanOrEqual(4);
-  }
-});

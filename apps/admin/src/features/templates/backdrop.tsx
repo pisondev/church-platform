@@ -2,10 +2,10 @@
 
 import { type CSSProperties, type RefObject, useLayoutEffect, useRef } from "react";
 
-// What lies behind the bumper: a bright, mostly white frame. From the back to the front:
-// a breath of sky, a kawung batik pattern in the top corners, slow waves of light blue
-// along the bottom, and motes of light drifting up. It keeps moving on its own and does
-// not start over when the bumper in front of it does. Like the bumper it runs on the Web
+// What lies behind a slide: a bright, mostly white frame. From the back to the front: a
+// breath of sky, a kawung batik pattern in the top corners, and slow waves of light blue
+// along the bottom. It keeps moving on its own and does not start over when the bumper in
+// front of it does. Like the bumper it runs on the Web
 // Animations API and is content, not interface motion.
 
 const cqw = (value: number) => `${value}cqw`;
@@ -92,55 +92,6 @@ export const DRIFT_KEYFRAMES: Keyframe[] = [{ transform: "translateX(0%)" }, { t
 export const WATER_DEPTH = 14;
 const DEEP_STYLE: CSSProperties = { height: cqw(WATER_DEPTH), background: "currentColor" };
 
-type Mote = {
-  // Where it starts: a share of the frame width, and cqw from the top.
-  x: number;
-  y: number;
-  // In cqw.
-  size: number;
-  // How far it leans sideways on its way up, in cqw.
-  sway: number;
-  seconds: number;
-  start: number;
-};
-
-// Fixed, so every screen shows the same sky. Fewer in the middle, where the text is.
-export const MOTES: Mote[] = [
-  { x: 4, y: 30, size: 2.6, sway: 2.5, seconds: 19, start: 0.1 },
-  { x: 9, y: 46, size: 1.6, sway: -1.5, seconds: 15, start: 0.55 },
-  { x: 16, y: 22, size: 3.6, sway: 3, seconds: 24, start: 0.8 },
-  { x: 23, y: 50, size: 2.1, sway: 2, seconds: 17, start: 0.3 },
-  { x: 31, y: 40, size: 1.4, sway: -2, seconds: 14, start: 0.65 },
-  { x: 40, y: 52, size: 2.8, sway: 1.5, seconds: 21, start: 0.2 },
-  { x: 50, y: 18, size: 1.8, sway: -2.5, seconds: 18, start: 0.9 },
-  { x: 58, y: 50, size: 2.2, sway: 2.5, seconds: 16, start: 0.45 },
-  { x: 67, y: 42, size: 1.5, sway: -1.5, seconds: 15, start: 0.05 },
-  { x: 75, y: 24, size: 3.2, sway: -3, seconds: 23, start: 0.6 },
-  { x: 82, y: 48, size: 2, sway: 2, seconds: 17, start: 0.35 },
-  { x: 89, y: 34, size: 2.9, sway: -2.5, seconds: 20, start: 0.75 },
-  { x: 95, y: 50, size: 1.7, sway: 1.5, seconds: 14, start: 0.25 },
-  { x: 97, y: 16, size: 2.3, sway: -2, seconds: 22, start: 0.5 },
-];
-
-// How far a mote rises in one pass, in cqw.
-const MOTE_RISE = 16;
-// How strong a mote is at its brightest, and when it stands still.
-const MOTE_GLOW = 0.9;
-
-// A mote comes out of nothing, drifts up while leaning to one side, and goes out again.
-export function moteKeyframes(mote: Mote): Keyframe[] {
-  return [
-    { offset: 0, opacity: 0, transform: "translate(0cqw, 0cqw)" },
-    { offset: 0.25, opacity: MOTE_GLOW },
-    { offset: 0.7, opacity: MOTE_GLOW },
-    { offset: 1, opacity: 0, transform: `translate(${cqw(mote.sway)}, ${cqw(-MOTE_RISE)})` },
-  ];
-}
-
-// A bright core in a soft blue halo: on a white frame light has to carry a little color.
-const MOTE_FILL =
-  "radial-gradient(circle, #ffffff 0%, rgb(147 197 253 / 0.9) 26%, rgb(191 219 254 / 0.4) 48%, rgb(191 219 254 / 0) 72%)";
-
 export function Backdrop({
   live,
   lift = 0,
@@ -153,27 +104,23 @@ export function Backdrop({
   water?: RefObject<HTMLDivElement | null>;
 }) {
   const waves = useRef<(HTMLDivElement | null)[]>([]);
-  const motes = useRef<(HTMLSpanElement | null)[]>([]);
 
   useLayoutEffect(() => {
     if (!live) return;
 
-    // Without the Web Animations API the backdrop stands still.
-    const play = (element: HTMLElement | null, keyframes: Keyframe[], seconds: number, extra: KeyframeEffectOptions) =>
-      element && typeof element.animate === "function"
-        ? [element.animate(keyframes, { duration: seconds * 1000, iterations: Infinity, ...extra })]
-        : [];
-
-    const running = [
-      ...waves.current.flatMap((wave, index) => {
-        const { seconds, reverse, start } = WAVES[index];
-        return play(wave, DRIFT_KEYFRAMES, seconds, { direction: reverse ? "reverse" : "normal", iterationStart: start });
-      }),
-      ...motes.current.flatMap((mote, index) => {
-        const { seconds, start } = MOTES[index];
-        return play(mote, moteKeyframes(MOTES[index]), seconds, { iterationStart: start });
-      }),
-    ];
+    const running = waves.current.flatMap((wave, index) => {
+      // Without the Web Animations API the waves stand still.
+      if (!wave || typeof wave.animate !== "function") return [];
+      const { seconds, reverse, start } = WAVES[index];
+      return [
+        wave.animate(DRIFT_KEYFRAMES, {
+          duration: seconds * 1000,
+          iterations: Infinity,
+          direction: reverse ? "reverse" : "normal",
+          iterationStart: start,
+        }),
+      ];
+    });
 
     return () => {
       for (const animation of running) animation.cancel();
@@ -204,25 +151,6 @@ export function Backdrop({
           </div>
         ))}
       </div>
-
-      {MOTES.map((mote, index) => (
-        <span
-          key={index}
-          ref={(element) => {
-            motes.current[index] = element;
-          }}
-          data-layer="mote"
-          className="absolute rounded-full"
-          style={{
-            left: `${mote.x}%`,
-            top: cqw(mote.y),
-            width: cqw(mote.size),
-            height: cqw(mote.size),
-            background: MOTE_FILL,
-            opacity: MOTE_GLOW,
-          }}
-        />
-      ))}
     </div>
   );
 }

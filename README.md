@@ -144,7 +144,7 @@ Opening a template starts the editor, laid out like a slides application:
 - **Slide panel.** Every slide in a numbered column on the left, scrolling on its own. The selected slide stays in view. The icon at its top closes the panel, and the icon in the status line, or View > Show the slide panel, brings it back.
 - **Stage.** The selected slide, fitted to the space available. A reading that takes several screens can be paged through from the status line.
 
-Arrow keys, Page Up, Page Down, Home and End move between slides. Slideshow covers the screen, starts from the selected slide and closes with Escape.
+Arrow keys, Page Up, Page Down, Home and End move between slides. Slideshow covers the screen, starts from the selected slide and closes with Escape. Its frames do not change at once: the one on screen fades out briefly, then the next one fades in. That is the default change between slides.
 
 The size of the slide on the stage is set inline rather than in `globals.css`. Without a width the slide collapses to nothing, and a development server can serve an older stylesheet than the one on disk.
 
@@ -165,7 +165,7 @@ The text comes from the cover slide:
 - **Notice.** The footer of the cover, meant for the request to silence phones. Text between asterisks is set in italics, for words in another language: "Handphone mohon dimatikan atau *silent*". Without a footer there is no band and nothing moves up.
 - The subtitle has no place in the bumper yet.
 
-Behind the bumper lies a backdrop, bright and mostly white. From the back to the front: a breath of sky at the top, a kawung batik pattern in the two top corners, three slow waves of light blue along the bottom, and motes of light drifting up. It keeps moving on its own and does not start over with each round. One thing follows the bumper: the water rises with the band, so the waves stay in sight above it, and sinks back while the round ends. The band of glass blurs what is behind it.
+Behind the bumper lies a backdrop, bright and mostly white. From the back to the front: a breath of sky at the top, a kawung batik pattern in the two top corners, and three slow waves of light blue along the bottom. It keeps moving on its own and does not start over with each round. One thing follows the bumper: the water rises with the band, so the waves stay in sight above it, and sinks back while the round ends. The band of glass blurs what is behind it.
 
 The bumper and its backdrop play on the stage and in the slideshow. The slide panel shows them at rest. A cover of a church without a logo shows its title, subtitle and footer as plain text.
 
