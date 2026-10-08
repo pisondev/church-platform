@@ -29,7 +29,12 @@ afterEach(() => {
   delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
 });
 
-const NOTICE = "Handphone mohon dimatikan atau silent";
+const NOTICE = "Handphone mohon dimatikan atau *silent*";
+
+// The band along the bottom that carries the notice. Its text is split around the word in
+// italics, so it is found by the part before that word.
+const noticeText = () => screen.queryByText(/^Handphone mohon dimatikan atau/);
+const band = () => noticeText()?.parentElement as HTMLElement;
 
 function renderBumper(live: boolean, notice: string | undefined = NOTICE) {
   const view = renderWithMessages(
@@ -64,19 +69,40 @@ test("a still bumper shows the logo, the title, the date and the notice, and nev
   expect(logo).toHaveAttribute("src", "/logos/church.webp");
   expect(screen.getByText("Ibadah Minggu ke-2")).toBeVisible();
   expect(screen.getByText("Minggu, 11 Oktober 2026")).toBeVisible();
-  expect(screen.getByText(NOTICE)).toBeVisible();
+  expect(band()).toBeVisible();
+  expect(band()).toHaveTextContent("Handphone mohon dimatikan atau silent");
   expect(animate).not.toHaveBeenCalled();
 });
 
-test("the notice carries a phone icon and sits at the bottom, with the rest lifted above the middle", () => {
-  const { logo } = renderBumper(false);
-  const notice = screen.getByText(NOTICE).parentElement as HTMLElement;
-  const lockup = logo.parentElement?.parentElement as HTMLElement;
+test("the notice is on a band of frosted glass, the last thing in the frame and as wide as it", () => {
+  const { scene } = renderBumper(false);
 
-  expect(notice.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
-  expect(notice.style.backdropFilter).toContain("blur(");
-  expect((notice.parentElement as HTMLElement).style.bottom).not.toBe("");
-  expect(lockup.style.marginBottom).not.toBe("");
+  expect(scene.lastElementChild).toBe(band());
+  expect(band().style.backdropFilter).toContain("blur(");
+  expect(band().style.height).not.toBe("");
+  // No width, radius or offset of its own: it spans the frame and reaches its bottom.
+  expect(band().style.width).toBe("");
+  expect(band().style.borderRadius).toBe("");
+});
+
+test("the phone on the notice is under a larger red sign", () => {
+  renderBumper(false);
+  const [phone, sign] = band().querySelectorAll("svg");
+  const size = (element: Element | null) => Number.parseFloat((element as HTMLElement).style.width);
+
+  expect(phone).toHaveAttribute("aria-hidden", "true");
+  expect(sign).toHaveAttribute("aria-hidden", "true");
+  expect(sign).toHaveStyle({ color: "rgb(220, 38, 38)" });
+  // The sign fills the box around both icons, and that box is larger than the phone.
+  expect(sign).toHaveClass("absolute", "inset-0", "size-full");
+  expect(size(sign.parentElement)).toBeGreaterThan(size(phone));
+});
+
+test("a word between asterisks in the notice is set in italics", () => {
+  renderBumper(false);
+
+  expect(screen.getByText("silent").tagName).toBe("EM");
+  expect(band()).not.toHaveTextContent("*");
 });
 
 test("a live bumper stays empty until the logo has loaded, then plays every part without end", () => {
@@ -99,15 +125,14 @@ test("a live bumper stays empty until the logo has loaded, then plays every part
   expect(parts.get(logo.parentElement?.parentElement)).toEqual(lockupKeyframes(true));
   expect(parts.get(screen.getByText("Ibadah Minggu ke-2"))).toBe(TITLE_KEYFRAMES);
   expect(parts.get(screen.getByText("Minggu, 11 Oktober 2026"))).toBe(DATE_KEYFRAMES);
-  expect(parts.get(screen.getByText(NOTICE).parentElement)).toBe(NOTICE_KEYFRAMES);
+  expect(parts.get(band())).toBe(NOTICE_KEYFRAMES);
 });
 
 test("without a notice nothing moves up and no room is kept for one", () => {
   const { logo } = renderBumper(true, "");
   fireEvent.load(logo);
 
-  expect(screen.queryByText(NOTICE)).not.toBeInTheDocument();
-  expect((logo.parentElement?.parentElement as HTMLElement).style.marginBottom).toBe("");
+  expect(noticeText()).not.toBeInTheDocument();
   expect(animate).toHaveBeenCalledTimes(6);
   expect(played().get(logo.parentElement?.parentElement)).toEqual(lockupKeyframes(false));
   expect(lockupKeyframes(false).every((frame) => numbers(frame)[1] === 0)).toBe(true);

@@ -6,15 +6,16 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 ### Added
 
-- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; everything moves up and the footer fades in near the bottom edge as a notice with a phone icon on frosted glass. It plays on the stage and in the slideshow, and stands still in the slide panel.
+- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; everything moves up and a band of frosted glass fades in along the bottom of the frame, carrying the footer as a notice next to a phone under a red "not allowed" sign. It plays on the stage and in the slideshow, and stands still in the slide panel.
 - `{n}` in a cover title stands for which Sunday of the month the service falls on.
+- Text between asterisks in a cover footer is set in italics, for words in another language.
 - Covers are dated for the coming Sunday, in Indonesian, until presentations carry their own date.
 - The GKJ Sentolo logo as an app asset, `apps/admin/public/logos/gkj-sentolo.webp`.
 
 ### Changed
 
 - The cover of a church with a logo shows its title, a date line and its footer through the bumper. Its subtitle is not shown.
-- Seeded cover of "Liturgi Umum": the title is "Ibadah Minggu ke-{n}" and the welcome line moved to the subtitle. A database seeded earlier keeps its old cover.
+- Seeded cover of "Liturgi Umum": the title is "Ibadah Minggu ke-{n}", the welcome line moved to the subtitle, and "silent" in the footer is marked for italics. A database seeded earlier keeps its old cover.
 - Template editor layout: the header is one thin row, and the slides moved from a strip along the bottom to a numbered panel on the left that can be closed and reopened.
 
 ### Removed

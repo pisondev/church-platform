@@ -155,14 +155,14 @@ The cover of a church that has a logo is a bumper: a short motion piece that rep
 1. The logo comes up from below the frame, flipping three times around its vertical axis. It leaves fast, slows down, passes the center by a little and sinks back onto it. A soft shadow follows it.
 2. It glides to the left, shrinking a little, and uncovers the title, which comes out from behind it.
 3. The date line appears under the title, moving in from the left. It is smaller than the title by the golden ratio.
-4. When the cover has a footer, everything moves up and the footer fades in near the bottom edge, as a notice with a phone icon on a sheet of frosted glass.
+4. When the cover has a footer, everything moves up and a band of frosted glass fades in along the bottom of the frame, from edge to edge. It carries the footer as a notice, next to a phone under a red "not allowed" sign.
 5. Everything rests, then fades out, and the next round starts from an empty frame.
 
 The text comes from the cover slide:
 
 - **Title.** `{n}` in it stands for which Sunday of the month the service falls on: "Ibadah Minggu ke-{n}" reads "Ibadah Minggu ke-2" on the second Sunday.
 - **Date line.** A template has no date of its own, so the cover is dated for the coming Sunday, or today on a Sunday, in Indonesian: "Minggu, 11 Oktober 2026". Presentations will bring their own date.
-- **Notice.** The footer of the cover, meant for the request to silence phones. Without one, nothing moves up.
+- **Notice.** The footer of the cover, meant for the request to silence phones. Text between asterisks is set in italics, for words in another language: "Handphone mohon dimatikan atau *silent*". Without a footer there is no band and nothing moves up.
 - The subtitle has no place in the bumper yet.
 
 The bumper plays on the stage and in the slideshow. The slide panel shows it at rest. A cover of a church without a logo shows its title, subtitle and footer as plain text.

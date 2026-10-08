@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { Bumper } from "./bumper";
 import { churchLogo } from "./church-logo";
+import { emphasize } from "./emphasis";
 import { coverTitle, serviceDateLine, upcomingSunday } from "./service-date";
 import type { Church, Frame, ReadingLine, TemplateSlide } from "./types";
 
@@ -41,7 +42,7 @@ function Cover({ title, subtitle, footer }: { title?: string; subtitle?: string;
       </div>
       {footer && (
         <p className="border-t border-black/20 px-[4cqw] py-[1.8cqw] text-center text-[2.2cqw] text-(--slide-muted)">
-          {footer}
+          {emphasize(footer)}
         </p>
       )}
     </div>

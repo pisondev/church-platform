@@ -58,7 +58,7 @@ func liturgiUmum() []seedSlide {
 		{Kind: "cover", Content: heading{
 			Title:    "Ibadah Minggu ke-{n}",
 			Subtitle: "Selamat Datang di Gereja Kristen Jawa Sentolo",
-			Footer:   "Handphone mohon dimatikan atau silent",
+			Footer:   "Handphone mohon dimatikan atau *silent*",
 		}},
 		section("Persiapan Ibadah", "Jemaat mempersiapkan diri memasuki ibadah. Majelis mempersiapkan di ruang konsistori."),
 		section("Bel", "Jemaat berdiri. Majelis menyapa dan mengajak memuji Tuhan."),

@@ -24,7 +24,7 @@ const cover: TemplateSlide = {
   content: {
     title: "Ibadah Minggu ke-{n}",
     subtitle: "Selamat Datang",
-    footer: "Handphone mohon dimatikan",
+    footer: "Handphone mohon dimatikan atau *silent*",
   },
 };
 
@@ -38,7 +38,8 @@ test("the cover of a church with a logo is a bumper: logo, numbered title, date 
   expect(screen.getByRole("img", { name: "GKJ Sentolo logo" })).toHaveAttribute("src", "/logos/gkj-sentolo.webp");
   expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();
   expect(screen.getByText("Minggu, 11 Oktober 2026")).toBeInTheDocument();
-  expect(screen.getByText("Handphone mohon dimatikan")).toBeInTheDocument();
+  expect(screen.getByText(/^Handphone mohon dimatikan atau/)).toBeInTheDocument();
+  expect(screen.getByText("silent").tagName).toBe("EM");
   // The subtitle has no place in the bumper yet.
   expect(screen.queryByText("Selamat Datang")).not.toBeInTheDocument();
 });
@@ -49,7 +50,8 @@ test("the cover of a church without a logo shows its numbered title, subtitle an
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
   expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();
   expect(screen.getByText("Selamat Datang")).toBeInTheDocument();
-  expect(screen.getByText("Handphone mohon dimatikan")).toBeInTheDocument();
+  expect(screen.getByText(/^Handphone mohon dimatikan atau/)).toHaveTextContent("Handphone mohon dimatikan atau silent");
+  expect(screen.getByText("silent").tagName).toBe("EM");
 });
 
 test("section shows its title and optional subtitle", () => {
