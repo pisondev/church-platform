@@ -1,0 +1,11 @@
+{
+  "Metadata": {
+    "description": "Admin panel for church and platform administrators."
+  },
+  "Home": {
+    "title": "Admin panel",
+    "lead": "Manage churches, admins and presentations from here.",
+    "signInUnavailable": "Sign-in is not available yet.",
+    "backToSite": "Back to the public site"
+  }
+}

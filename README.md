@@ -9,6 +9,8 @@ The first feature in scope is Presentation: reusable liturgy templates and the w
 | Path | Purpose |
 | --- | --- |
 | `apps/api` | HTTP API (Go, Gin, PostgreSQL) |
+| `apps/web` | Public site (Next.js, Tailwind CSS, Lucide) |
+| `apps/admin` | Admin panel for Super Admins and Church Admins (Next.js, Tailwind CSS, Lucide) |
 | `infra` | Local infrastructure files used by Docker Compose |
 | `.githooks` | Versioned git hooks |
 | `scripts` | Repository tooling and its tests |
@@ -30,6 +32,8 @@ pnpm db:up          # PostgreSQL on localhost:5433
 pnpm db:migrate     # apply the schema
 pnpm db:seed        # first church and Super Admins
 pnpm dev:api        # API on http://localhost:4000
+pnpm dev:web        # public site on http://localhost:3100
+pnpm dev:admin      # admin panel on http://localhost:3101
 ```
 
 ## Scripts
@@ -37,15 +41,17 @@ pnpm dev:api        # API on http://localhost:4000
 | Command | What it does |
 | --- | --- |
 | `pnpm dev:api` | Runs the API |
+| `pnpm dev:web` / `pnpm dev:admin` | Runs the public site or the admin panel |
 | `pnpm db:up` / `pnpm db:down` | Starts or stops the local PostgreSQL container |
 | `pnpm db:migrate` | Applies pending migrations |
 | `pnpm db:seed` | Inserts the baseline data; safe to repeat |
-| `pnpm lint` | Vets the Go code |
+| `pnpm lint` | Vets the Go code and runs ESLint on both frontends |
+| `pnpm typecheck` | Type-checks both frontends |
 | `pnpm test` | Runs every unit test |
 | `pnpm test:hooks` | Tests the commit message hook |
 | `pnpm test:api` | Runs the API tests; database tests are skipped |
 | `pnpm test:api:db` | Runs the API tests including the database tests |
-| `pnpm build` | Builds the API binary into `apps/api/bin` |
+| `pnpm build` | Builds the API binary into `apps/api/bin` and both frontends |
 
 ## Configuration
 
@@ -58,6 +64,13 @@ The API reads environment variables, and loads `.env` from the repository root i
 | `DATABASE_URL` | required | PostgreSQL connection string |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:3100,http://localhost:3101` | Origins allowed to call the API with credentials |
 | `SUPER_ADMIN_EMAILS` | empty | Emails that hold the Super Admin role |
+
+The frontends read these at build time:
+
+| Variable | Default | Used by |
+| --- | --- | --- |
+| `NEXT_PUBLIC_ADMIN_URL` | `http://localhost:3101` | `apps/web`, for the sign-in link |
+| `NEXT_PUBLIC_WEB_URL` | `http://localhost:3100` | `apps/admin`, for the link back to the site |
 
 ## Database
 
@@ -83,6 +96,14 @@ Database tests need `TEST_DATABASE_URL`. Each test runs in its own schema and dr
 | `GET /readyz` | Readiness: the database answers |
 
 Errors use one envelope: `{"error": {"code": "not_found", "message": "resource not found"}}`. Every response carries an `X-Request-ID` header, reused from the request when well formed.
+
+## Frontends
+
+Both apps use the Next.js App Router with Cache Components enabled, so pages are prerendered unless they opt into request-time data.
+
+- **Product name.** It lives in `src/config/site.ts` of each app. Change it there only.
+- **Copy.** UI text lives in `messages/en.json` and is read through [next-intl](https://next-intl.dev). Keys are type-checked. To add a language, add its code to `src/i18n/config.ts`, add `messages/<code>.json`, and resolve the locale in `src/i18n/request.ts`.
+- **Tests.** Vitest with Testing Library. `renderWithMessages` in `src/test-utils.tsx` renders a component with the English messages.
 
 ## Git hooks
 

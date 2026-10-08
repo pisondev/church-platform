@@ -1,0 +1,30 @@
+{
+  "Metadata": {
+    "description": "Church management platform with presentation tools for weekly worship."
+  },
+  "Header": {
+    "signIn": "Sign in"
+  },
+  "Home": {
+    "eyebrow": "Church management platform",
+    "title": "Prepare Sunday worship slides in minutes",
+    "lead": "Build each week's presentation from a reusable liturgy template instead of starting from a blank file.",
+    "features": {
+      "templates": {
+        "title": "Liturgy templates",
+        "body": "Set the order of worship once and reuse it every week."
+      },
+      "library": {
+        "title": "Songs and scripture",
+        "body": "Pick a hymn or a passage and its slides are filled in for you."
+      },
+      "present": {
+        "title": "Present and export",
+        "body": "Run the slideshow full screen or download it as a PDF."
+      }
+    }
+  },
+  "Footer": {
+    "rights": "All rights reserved."
+  }
+}

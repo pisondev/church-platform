@@ -1,3 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+  - "@parcel/watcher"
+  - "@swc/core"
