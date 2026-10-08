@@ -23,6 +23,31 @@ async function load<T>(path: string): Promise<ApiState<T>> {
   }
 }
 
+export type SendResult<T> = { ok: true; data: T } | { ok: false; status: number; code: string };
+
+// Sends a change to the API. `code` is the error code of the API, or "network".
+export async function apiSend<T>(
+  method: "POST" | "PUT" | "PATCH" | "DELETE",
+  path: string,
+  body?: unknown,
+): Promise<SendResult<T>> {
+  try {
+    const response = await fetch(`${siteConfig.apiUrl}/api/v1${path}`, {
+      method,
+      credentials: "include",
+      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const payload = response.status === 204 ? null : await response.json().catch(() => null);
+    if (!response.ok) {
+      return { ok: false, status: response.status, code: payload?.error?.code ?? "unknown" };
+    }
+    return { ok: true, data: payload as T };
+  } catch {
+    return { ok: false, status: 0, code: "network" };
+  }
+}
+
 // Loads a resource from the API. A new path starts over from "loading".
 export function useApi<T>(path: string): ApiState<T> {
   const [loaded, setLoaded] = useState<{ path: string; state: ApiState<T> } | null>(null);

@@ -55,11 +55,54 @@
     "templateMeta": "{count, plural, one {# slide} other {# slides}} · {ratio}"
   },
   "Templates": {
-    "meta": "{count, plural, one {# slide} other {# slides}} · {ratio}",
     "slots": {
       "song": "Song",
       "scripture": "Scripture",
       "hint": "Chosen when a presentation is made from this template"
     }
+  },
+  "Editor": {
+    "back": "Back to {church}",
+    "titleLabel": "Template name",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "errors": {
+      "name_taken": "Another template already has this name.",
+      "invalid_name": "Use 1 to 120 characters.",
+      "failed": "Could not save. Try again."
+    },
+    "menubar": "Editor menu",
+    "menus": {
+      "file": "File",
+      "view": "View",
+      "slide": "Slide"
+    },
+    "commands": {
+      "rename": "Rename",
+      "backToChurch": "Back to {church}",
+      "presentFromStart": "Slideshow from the first slide",
+      "presentFromCurrent": "Slideshow from this slide",
+      "next": "Next slide",
+      "previous": "Previous slide",
+      "first": "First slide",
+      "last": "Last slide"
+    },
+    "slideshow": "Slideshow",
+    "presenting": "Slideshow",
+    "account": "Signed in as {name}",
+    "position": "Slide {current} of {total}",
+    "kinds": {
+      "cover": "Cover",
+      "section": "Section",
+      "song": "Song",
+      "scripture": "Scripture",
+      "responsive_reading": "Responsive reading"
+    },
+    "screen": "Screen {current} of {total}",
+    "previousScreen": "Previous screen",
+    "nextScreen": "Next screen",
+    "filmstrip": "Slides",
+    "goTo": "Slide {number}: {kind}",
+    "empty": "This template has no slides yet."
   }
 }

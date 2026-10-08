@@ -1,15 +1,16 @@
 "use client";
 
-import { LogOut, ShieldCheck } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
+import { BrandMark } from "@/components/brand-mark";
 import { siteConfig } from "@/config/site";
 
 import { displayName, useSession } from "./session";
 
-// Header shared by every admin page: brand, navigation and the signed-in user.
+// Header of the panel pages: brand, navigation and the signed-in user.
 export function AppShell({ children }: { children: ReactNode }) {
   const nav = useTranslations("Nav");
   const t = useTranslations("Session");
@@ -21,7 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-6 px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
-            <ShieldCheck aria-hidden className="size-5 text-accent" />
+            <BrandMark className="size-7" />
             {siteConfig.name}
           </Link>
           <nav aria-label="Main" className="flex items-center gap-5 text-sm">

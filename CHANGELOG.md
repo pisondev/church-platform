@@ -28,11 +28,13 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 - Templates in the API: `templates` and `template_slides` tables, read endpoints scoped to the churches a user manages, and a seeded "Liturgi Umum" template for GKJ Sentolo.
 - `pnpm check` runs lint, type-check, tests and builds together.
 - Endpoint to rename a template.
+- Template editor in the admin panel, laid out like a slides application: a header with the logo, an editable name and File, View and Slide menus, the selected slide on a stage, and a filmstrip along the bottom that scrolls sideways. Slideshow presents from the selected slide.
 - Church and template pages in the admin panel: the home page links to each church, a church lists its templates, and a template previews its slides, with long responsive readings spread over numbered frames.
 - Session gate in the admin panel: pages show only to a signed-in user, with a header for navigation, the user and sign-out, and a home page listing the churches they manage.
 
 ### Changed
 
+- Admin pages are grouped: panel pages share one header, and the editor has its own full-screen layout.
 - The product is now named EccleService, with the tagline "a service for your Ecclesia (a.k.a Church)".
 - Both apps are light only and no longer follow the system dark setting. Slides are dark text on white, which stays readable on a weak projector.
 - The API listens on loopback only outside production, so `pnpm dev:api` no longer triggers the Windows firewall prompt.

@@ -134,11 +134,19 @@ Both apps use the Next.js App Router with Cache Components enabled, so pages are
 
 ## Churches and templates
 
-The admin home lists the churches the signed-in user manages. A church page lists its templates, and a template page previews every slide in the same slideshow the songs use.
+The admin home lists the churches the signed-in user manages, and a church page lists its templates.
 
-A template is an ordered list of slides of five kinds: cover, section, song, scripture and responsive reading. Song and scripture slides are empty slots, filled when a presentation is made. A responsive reading that does not fit on one screen is spread over numbered frames, and each role has its own color.
+A template is an ordered list of slides of five kinds: cover, section, song, scripture and responsive reading. Song and scripture slides are empty slots, filled when a presentation is made. A responsive reading that does not fit on one screen is spread over numbered screens, and each role has its own color.
 
-Templates are read-only for now: the first one, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`. Editing and weekly presentations are not built yet.
+Opening a template starts the editor, laid out like a slides application:
+
+- **Header.** The logo leads back to the church. The name is edited in place: Enter or leaving the field saves, Escape restores it. Below it are the File, View and Slide menus; on the right, the Slideshow button and the signed-in account.
+- **Stage.** The selected slide, fitted to the space available. A reading that takes several screens can be paged through.
+- **Filmstrip.** Every slide along the bottom, scrolling sideways, also with a plain mouse wheel. The selected slide stays in view.
+
+Arrow keys, Page Up, Page Down, Home and End move between slides. Slideshow covers the screen, starts from the selected slide and closes with Escape.
+
+The editor can rename a template so far. Adding, changing, moving and removing slides is not built yet, and neither are weekly presentations. The first template, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`.
 
 ## Songs and slides
 

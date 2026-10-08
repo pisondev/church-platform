@@ -6,7 +6,6 @@ import { type ReactNode, useCallback, useEffect, useState } from "react";
 
 import { siteConfig } from "@/config/site";
 
-import { AppShell } from "./app-shell";
 import { type Session, SessionContext } from "./session";
 
 type State =
@@ -46,6 +45,7 @@ const actionClass =
   "inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90";
 
 // Shows the app only to a signed-in user. The API enforces access; this is the front door.
+// Pages choose their own chrome: the panel layout adds the shared header, the editor has its own.
 export function SessionGate({ children }: { children: ReactNode }) {
   const t = useTranslations("Session");
   const [state, setState] = useState<State>({ status: "loading" });
@@ -101,9 +101,7 @@ export function SessionGate({ children }: { children: ReactNode }) {
       );
     case "signed-in":
       return (
-        <SessionContext value={{ session: state.session, signOut }}>
-          <AppShell>{children}</AppShell>
-        </SessionContext>
+        <SessionContext value={{ session: state.session, signOut }}>{children}</SessionContext>
       );
   }
 }
