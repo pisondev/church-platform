@@ -55,6 +55,7 @@
     "templateMeta": "{count, plural, one {# slide} other {# slides}} · {ratio}"
   },
   "Templates": {
+    "logo": "{church} logo",
     "slots": {
       "song": "Song",
       "scripture": "Scripture",

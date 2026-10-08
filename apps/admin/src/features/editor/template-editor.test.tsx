@@ -10,7 +10,9 @@ import { TemplateEditor } from "./template-editor";
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
-const church: Church = { id: "church-1", name: "GKJ Sentolo", slug: "gkj-sentolo", status: "active" };
+// No logo ships for this church, so its cover shows text. The bumper is tested further down.
+const church: Church = { id: "church-1", name: "GKJ Contoh", slug: "gkj-contoh", status: "active" };
+const churchWithLogo: Church = { id: "church-2", name: "GKJ Sentolo", slug: "gkj-sentolo", status: "active" };
 
 const creedLines = Array.from({ length: 9 }, (_, index) => ({ role: "P+J", text: `Baris ${index + 1}` }));
 
@@ -42,8 +44,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function renderEditor(value: Template = template) {
-  return renderWithSession(<TemplateEditor church={church} template={value} />);
+function renderEditor(value: Template = template, owner: Church = church) {
+  return renderWithSession(<TemplateEditor church={owner} template={value} />);
 }
 
 const stage = () => within(screen.getByRole("main"));
@@ -59,7 +61,7 @@ function chooseCommand(menu: string, command: string) {
 test("header has the logo back to the church, the name, the menus and the account", () => {
   renderEditor();
 
-  expect(screen.getByRole("link", { name: "Back to GKJ Sentolo" })).toHaveAttribute("href", "/churches/gkj-sentolo");
+  expect(screen.getByRole("link", { name: "Back to GKJ Contoh" })).toHaveAttribute("href", "/churches/gkj-contoh");
   expect(title()).toHaveValue("Liturgi Umum");
   expect(screen.getByRole("menubar", { name: messages.Editor.menubar })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: messages.Editor.slideshow })).toBeEnabled();
@@ -143,7 +145,7 @@ test("renaming saves through the API and confirms it", async () => {
 
   expect(await screen.findByText(messages.Editor.saved)).toBeInTheDocument();
   expect(title()).toHaveValue("Liturgi Natal");
-  expect(fetchMock).toHaveBeenCalledWith(`${siteConfig.apiUrl}/api/v1/churches/gkj-sentolo/templates/tpl-1`, {
+  expect(fetchMock).toHaveBeenCalledWith(`${siteConfig.apiUrl}/api/v1/churches/gkj-contoh/templates/tpl-1`, {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -184,9 +186,9 @@ test("File > Rename puts the cursor in the name field", () => {
 test("File > Back goes to the church page", () => {
   renderEditor();
 
-  chooseCommand(messages.Editor.menus.file, "Back to GKJ Sentolo");
+  chooseCommand(messages.Editor.menus.file, "Back to GKJ Contoh");
 
-  expect(push).toHaveBeenCalledWith("/churches/gkj-sentolo");
+  expect(push).toHaveBeenCalledWith("/churches/gkj-contoh");
 });
 
 test("Slideshow presents from the selected slide and Escape closes it", async () => {
@@ -265,6 +267,41 @@ test("the stage sizes the slide itself, without help from a stylesheet", () => {
   const main = screen.getByRole("main");
   expect(main.style.containerType).toBe("size");
   expect((main.firstElementChild as HTMLElement).style.width).toContain("100cqh");
+});
+
+test("the cover of a church with a logo plays on the stage and stands still in the panel", () => {
+  const animate = vi.fn(() => ({ cancel: vi.fn() }) as unknown as Animation);
+  HTMLElement.prototype.animate = animate;
+
+  try {
+    renderEditor(template, churchWithLogo);
+    const onStage = stage().getByRole("img", { name: "GKJ Sentolo logo" });
+    const inPanel = strip().getByRole("img", { name: "GKJ Sentolo logo" });
+    fireEvent.load(inPanel);
+    fireEvent.load(onStage);
+
+    expect(animate).toHaveBeenCalled();
+    expect(animate.mock.contexts.every((element) => screen.getByRole("main").contains(element as Node))).toBe(true);
+    expect(stage().queryByText("Selamat Datang")).not.toBeInTheDocument();
+  } finally {
+    delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+  }
+});
+
+test("the slideshow plays the cover of a church with a logo", () => {
+  const animate = vi.fn(() => ({ cancel: vi.fn() }) as unknown as Animation);
+  HTMLElement.prototype.animate = animate;
+
+  try {
+    renderEditor(template, churchWithLogo);
+    fireEvent.click(screen.getByRole("button", { name: messages.Editor.slideshow }));
+    const dialog = screen.getByRole("dialog", { name: messages.Editor.presenting });
+    fireEvent.load(within(dialog).getByRole("img", { name: "GKJ Sentolo logo" }));
+
+    expect(animate.mock.contexts.some((element) => dialog.contains(element as Node))).toBe(true);
+  } finally {
+    delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+  }
 });
 
 test("an empty template says so and cannot be presented", () => {

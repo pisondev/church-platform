@@ -4,9 +4,19 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 ## 2026-10-09
 
+### Added
+
+- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while turning around its vertical axis, passes the center a little, settles on it with a soft shadow, then fades before the next round. It plays on the stage and in the slideshow, and stands still in the slide panel.
+- The GKJ Sentolo logo as an app asset, `apps/admin/public/logos/gkj-sentolo.webp`.
+
 ### Changed
 
+- The cover of a church with a logo no longer shows its title, subtitle and footer while the bumper is being built.
 - Template editor layout: the header is one thin row, and the slides moved from a strip along the bottom to a numbered panel on the left that can be closed and reopened.
+
+### Removed
+
+- `gkj-logo-hd_without-bg.png` from the repository root. The source picture was committed by accident; the app uses the smaller copy in `apps/admin/public/logos`.
 
 ### Fixed
 

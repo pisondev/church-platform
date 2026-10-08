@@ -5,20 +5,35 @@ import { messages, renderWithMessages } from "@/test-utils";
 
 import { FrameView } from "./frame-view";
 import { buildFrames } from "./frames";
-import type { TemplateSlide } from "./types";
+import type { Church, TemplateSlide } from "./types";
 
-function renderSlide(slide: TemplateSlide, frame = 0) {
-  return renderWithMessages(<FrameView frame={buildFrames([slide])[frame]} />);
+function renderSlide(slide: TemplateSlide, frame = 0, church?: Pick<Church, "name" | "slug">) {
+  return renderWithMessages(<FrameView frame={buildFrames([slide])[frame]} church={church} />);
 }
 
-test("cover shows its title, subtitle and footer", () => {
-  renderSlide({
-    id: "1",
-    position: 1,
-    kind: "cover",
-    content: { title: "Selamat Datang", subtitle: "Ibadah Minggu", footer: "Handphone mohon dimatikan" },
+test("the cover of a church with a logo is a bumper: the logo, without the text", () => {
+  renderSlide({ id: "1", position: 1, kind: "cover", content: { title: "Selamat Datang" } }, 0, {
+    name: "GKJ Sentolo",
+    slug: "gkj-sentolo",
   });
 
+  expect(screen.getByRole("img", { name: "GKJ Sentolo logo" })).toHaveAttribute("src", "/logos/gkj-sentolo.webp");
+  expect(screen.queryByText("Selamat Datang")).not.toBeInTheDocument();
+});
+
+test("the cover of a church without a logo shows its title, subtitle and footer", () => {
+  renderSlide(
+    {
+      id: "1",
+      position: 1,
+      kind: "cover",
+      content: { title: "Selamat Datang", subtitle: "Ibadah Minggu", footer: "Handphone mohon dimatikan" },
+    },
+    0,
+    { name: "GKJ Contoh", slug: "gkj-contoh" },
+  );
+
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
   expect(screen.getByText("Selamat Datang")).toBeInTheDocument();
   expect(screen.getByText("Ibadah Minggu")).toBeInTheDocument();
   expect(screen.getByText("Handphone mohon dimatikan")).toBeInTheDocument();

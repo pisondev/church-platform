@@ -148,6 +148,18 @@ Arrow keys, Page Up, Page Down, Home and End move between slides. Slideshow cove
 
 The size of the slide on the stage is set inline rather than in `globals.css`. Without a width the slide collapses to nothing, and a development server can serve an older stylesheet than the one on disk.
 
+### Cover bumper
+
+The cover of a church that has a logo is a bumper: a short motion piece that repeats for as long as the slide is shown. One round takes 8 seconds:
+
+1. The logo comes up from below the frame, turning around its vertical axis. It leaves fast and slows down.
+2. It passes the center by a little, then sinks back onto it and rests there. A soft shadow follows it.
+3. It fades out, and the next round starts from an empty frame.
+
+The bumper plays on the stage and in the slideshow. The slide panel shows it at rest. The cover text is not shown while the bumper is being built; a cover of a church without a logo still shows its title, subtitle and footer.
+
+The motion is in `apps/admin/src/features/templates/bumper.tsx`. It runs on the Web Animations API, so it does not depend on a stylesheet, and it plays even when the system asks for reduced motion, because it is content like a video. Logos ship with the app for now, in `apps/admin/public/logos`, listed by church slug in `church-logo.ts`. Churches cannot upload their own yet.
+
 The editor can rename a template so far. Adding, changing, moving and removing slides is not built yet, and neither are weekly presentations. The first template, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`.
 
 ## Songs and slides

@@ -35,7 +35,17 @@ function isTextField(target: EventTarget | null): boolean {
 
 // The slide being worked on, with a status line under it. A responsive reading that takes
 // several screens can be paged through here.
-function Stage({ slide, position, leading }: { slide: TemplateSlide; position: string; leading: ReactNode }) {
+function Stage({
+  church,
+  slide,
+  position,
+  leading,
+}: {
+  church: Church;
+  slide: TemplateSlide;
+  position: string;
+  leading: ReactNode;
+}) {
   const t = useTranslations("Editor");
   const screens = useMemo(() => buildFrames([slide]), [slide]);
   const [screen, setScreen] = useState(0);
@@ -44,7 +54,7 @@ function Stage({ slide, position, leading }: { slide: TemplateSlide; position: s
     <>
       <main className="flex min-h-0 flex-1 items-center justify-center" style={STAGE_STYLE}>
         <div className="shadow-lg" style={CANVAS_STYLE}>
-          <FrameView frame={screens[screen]} />
+          <FrameView frame={screens[screen]} church={church} live />
         </div>
       </main>
 
@@ -235,12 +245,19 @@ export function TemplateEditor({ church, template }: { church: Church; template:
 
       <div className="flex min-h-0 flex-1">
         {panelOpen && (
-          <Filmstrip frames={thumbnails} selected={selected} onSelect={select} onClose={() => setPanelOpen(false)} />
+          <Filmstrip
+            church={church}
+            frames={thumbnails}
+            selected={selected}
+            onSelect={select}
+            onClose={() => setPanelOpen(false)}
+          />
         )}
         <div className="flex min-w-0 flex-1 flex-col">
           {current ? (
             <Stage
               key={current.id}
+              church={church}
               slide={current}
               position={t("position", { current: selected + 1, total: slides.length })}
               leading={showPanel}
@@ -258,7 +275,7 @@ export function TemplateEditor({ church, template }: { church: Church; template:
         <Presenter
           label={t("presenting")}
           frames={frames.map((frame) => (
-            <FrameView key={frame.key} frame={frame} />
+            <FrameView key={frame.key} frame={frame} church={church} live />
           ))}
           start={presentingFrom}
           onClose={stopPresenting}

@@ -5,16 +5,18 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 
 import { FrameView } from "@/features/templates/frame-view";
-import type { Frame } from "@/features/templates/types";
+import type { Church, Frame } from "@/features/templates/types";
 
 // The panel of slide thumbnails on the left of the stage. It scrolls on its own, keeps
 // the selected slide in view and can be closed to give the stage the full width.
 export function Filmstrip({
+  church,
   frames,
   selected,
   onSelect,
   onClose,
 }: {
+  church: Church;
   // The first frame of every slide, in order.
   frames: Frame[];
   selected: number;
@@ -57,7 +59,7 @@ export function Filmstrip({
                 {index + 1}
               </span>
               <span className="block min-w-0 flex-1 overflow-hidden rounded border border-border group-hover:border-accent group-aria-[current]:border-accent group-aria-[current]:ring-2 group-aria-[current]:ring-accent">
-                <FrameView frame={frame} />
+                <FrameView frame={frame} church={church} />
               </span>
             </button>
           </li>

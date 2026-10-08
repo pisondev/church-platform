@@ -1,7 +1,9 @@
 import { BookOpen, Music } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import type { Frame, ReadingLine } from "./types";
+import { Bumper } from "./bumper";
+import { churchLogo } from "./church-logo";
+import type { Church, Frame, ReadingLine } from "./types";
 
 // Slide text is worship content in its own language and is not translated. Only the
 // labels of empty slots are interface text. Sizes use cqw, a share of the slide width.
@@ -84,13 +86,25 @@ function Reading({ title, lines, page, pages }: { title?: string; lines: Reading
   );
 }
 
-// Draws one frame of a template.
-export function FrameView({ frame }: { frame: Frame }) {
+// Draws one frame of a template. The cover of a church that has a logo is a bumper, and
+// its text is not shown for now; any other cover shows its text. Motion plays only when
+// the frame is live: thumbnails stay still.
+export function FrameView({
+  frame,
+  church,
+  live = false,
+}: {
+  frame: Frame;
+  church?: Pick<Church, "name" | "slug">;
+  live?: boolean;
+}) {
   const { slide } = frame;
+  const logo = church && churchLogo(church.slug);
 
   return (
     <div className="slide-frame">
-      {slide.kind === "cover" && <Cover {...slide.content} />}
+      {slide.kind === "cover" &&
+        (logo ? <Bumper logo={logo} church={church.name} live={live} /> : <Cover {...slide.content} />)}
       {slide.kind === "section" && <Heading {...slide.content} />}
       {(slide.kind === "song" || slide.kind === "scripture") && <Slot kind={slide.kind} />}
       {slide.kind === "responsive_reading" && (
