@@ -10,11 +10,14 @@
     "dev:api": "go -C apps/api run ./cmd/api serve",
     "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose down",
+    "db:migrate": "go -C apps/api run ./cmd/api migrate",
+    "db:seed": "go -C apps/api run ./cmd/api seed",
     "lint": "pnpm run lint:api",
     "lint:api": "go -C apps/api vet ./...",
     "test": "pnpm run test:hooks && pnpm run test:api",
     "test:hooks": "node --test scripts/commit-msg-hook.test.mjs",
     "test:api": "go -C apps/api test ./...",
+    "test:api:db": "node scripts/test-api-db.mjs",
     "build": "pnpm run build:api",
     "build:api": "go -C apps/api build -o bin/ ./cmd/api"
   }

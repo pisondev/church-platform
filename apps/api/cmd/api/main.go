@@ -1,4 +1,6 @@
-// Command api runs the church platform HTTP API.
+// Command api runs the church platform HTTP API and its database tasks.
+//
+// Usage: api [serve|migrate|seed]
 package main
 
 import (
@@ -18,6 +20,7 @@ import (
 
 	"github.com/pisondev/church-platform/apps/api/internal/config"
 	"github.com/pisondev/church-platform/apps/api/internal/database"
+	"github.com/pisondev/church-platform/apps/api/internal/seed"
 	"github.com/pisondev/church-platform/apps/api/internal/server"
 )
 
@@ -59,8 +62,21 @@ func run(args []string) error {
 	switch command {
 	case "serve":
 		return serve(ctx, cfg, pool, logger)
+	case "migrate":
+		applied, err := database.Migrate(ctx, pool)
+		if err != nil {
+			return err
+		}
+		logger.Info("migrations up to date", "applied", applied)
+		return nil
+	case "seed":
+		if err := seed.Run(ctx, pool, seed.Options{SuperAdminEmails: cfg.SuperAdminEmails}); err != nil {
+			return err
+		}
+		logger.Info("seed complete", "church", seed.FirstChurchSlug, "super_admins", len(cfg.SuperAdminEmails))
+		return nil
 	default:
-		return fmt.Errorf("unknown command %q (want serve)", command)
+		return fmt.Errorf("unknown command %q (want serve, migrate or seed)", command)
 	}
 }
 

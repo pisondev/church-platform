@@ -12,3 +12,6 @@ All notable changes are recorded here. The format follows [Keep a Changelog](htt
 - `.env.example` listing the runtime configuration.
 - API service (Go, Gin) with environment-based configuration, request IDs, structured access logs, panic recovery, CORS for the frontends, and `/healthz` and `/readyz`.
 - Docker Compose service for local PostgreSQL, with a separate test database.
+- Identity schema (`churches`, `users`, `church_admins`) as embedded SQL migrations, with `migrate` and `seed` commands.
+- Seed data: the GKJ Sentolo church and Super Admin accounts from `SUPER_ADMIN_EMAILS`.
+- Database tests that run in isolated schemas when `TEST_DATABASE_URL` is set.
