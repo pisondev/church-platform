@@ -33,7 +33,10 @@ function renderSlide(slide: TemplateSlide, frame = 0, church?: Pick<Church, "nam
 }
 
 test("the cover of a church with a logo is a bumper: logo, numbered title, date and notice", () => {
-  renderSlide(cover, 0, { name: "GKJ Sentolo", slug: "gkj-sentolo" });
+  const { container } = renderSlide(cover, 0, { name: "GKJ Sentolo", slug: "gkj-sentolo" });
+
+  // The moving backdrop lies behind it, before it in the frame.
+  expect(container.querySelector(".slide-frame [aria-hidden=true] svg path")).toBeInTheDocument();
 
   expect(screen.getByRole("img", { name: "GKJ Sentolo logo" })).toHaveAttribute("src", "/logos/gkj-sentolo.webp");
   expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();
@@ -45,7 +48,9 @@ test("the cover of a church with a logo is a bumper: logo, numbered title, date 
 });
 
 test("the cover of a church without a logo shows its numbered title, subtitle and footer", () => {
-  renderSlide(cover, 0, { name: "GKJ Contoh", slug: "gkj-contoh" });
+  const { container } = renderSlide(cover, 0, { name: "GKJ Contoh", slug: "gkj-contoh" });
+
+  expect(container.querySelector("svg")).not.toBeInTheDocument();
 
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
   expect(screen.getByText("Ibadah Minggu ke-2")).toBeInTheDocument();

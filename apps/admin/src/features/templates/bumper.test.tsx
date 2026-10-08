@@ -4,11 +4,11 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { renderWithMessages } from "@/test-utils";
 
 import {
+  BAND_KEYFRAMES,
   Bumper,
   DATE_KEYFRAMES,
   LIFT_KEYFRAMES,
   LOOP_MS,
-  NOTICE_KEYFRAMES,
   SCENE_KEYFRAMES,
   SPIN_KEYFRAMES,
   TITLE_KEYFRAMES,
@@ -125,7 +125,7 @@ test("a live bumper stays empty until the logo has loaded, then plays every part
   expect(parts.get(logo.parentElement?.parentElement)).toEqual(lockupKeyframes(true));
   expect(parts.get(screen.getByText("Ibadah Minggu ke-2"))).toBe(TITLE_KEYFRAMES);
   expect(parts.get(screen.getByText("Minggu, 11 Oktober 2026"))).toBe(DATE_KEYFRAMES);
-  expect(parts.get(band())).toBe(NOTICE_KEYFRAMES);
+  expect(parts.get(band())).toBe(BAND_KEYFRAMES);
 });
 
 test("without a notice nothing moves up and no room is kept for one", () => {
@@ -238,19 +238,23 @@ test("the date line appears after the title is complete, moving right", () => {
   expect(numbers(arrived)[0]).toBe(0);
 });
 
-test("once the text is complete everything moves up and the notice fades in below", () => {
+test("once the text is complete the band rises from the bottom edge and everything moves up with it", () => {
   const [, , , low, raised] = lockupKeyframes(true);
-  const [, unseen, seen] = NOTICE_KEYFRAMES;
+  const [first, below, risen] = BAND_KEYFRAMES;
 
   expect(offsetOf(low)).toBeGreaterThanOrEqual(offsetOf(DATE_KEYFRAMES[2]));
   expect(numbers(low)[1]).toBeGreaterThan(0);
   expect(numbers(raised)).toEqual([0, 0]);
 
-  // The notice does not move: it only fades in, not before the room for it opens.
-  expect(NOTICE_KEYFRAMES.every((frame) => frame.transform === undefined)).toBe(true);
-  expect(offsetOf(unseen)).toBeGreaterThan(offsetOf(low));
-  expect(unseen.opacity).toBe(0);
-  expect(seen.opacity).toBe(1);
+  // The band starts a full height below its place, out of the frame, and ends in it.
+  expect(numbers(first)[0]).toBe(100);
+  expect(numbers(below)[0]).toBe(100);
+  expect(numbers(risen)[0]).toBe(0);
+  // It moves with the group above it: same start, same end, same pace.
+  expect([offsetOf(below), offsetOf(risen)]).toEqual([offsetOf(low), offsetOf(raised)]);
+  expect(below.easing).toBe(low.easing);
+  // It rises; it does not fade.
+  expect(BAND_KEYFRAMES.every((frame) => frame.opacity === undefined)).toBe(true);
 });
 
 test("each round ends on an empty frame, so the next one starts clean", () => {
@@ -261,5 +265,5 @@ test("each round ends on an empty frame, so the next one starts clean", () => {
   expect(offsetOf(last)).toBe(1);
   expect(last.opacity).toBe(0);
   // The finished bumper is on screen for most of the round.
-  expect(offsetOf(fadeStart) - offsetOf(NOTICE_KEYFRAMES[2])).toBeGreaterThan(0.4);
+  expect(offsetOf(fadeStart) - offsetOf(BAND_KEYFRAMES[2])).toBeGreaterThan(0.4);
 });

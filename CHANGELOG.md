@@ -6,7 +6,8 @@ All notable changes are recorded here, grouped by the date they landed, newest f
 
 ### Added
 
-- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; everything moves up and a band of frosted glass fades in along the bottom of the frame, carrying the footer as a notice next to a phone under a red "not allowed" sign. It plays on the stage and in the slideshow, and stands still in the slide panel.
+- Cover bumper: the cover of a church with a logo is a looping motion piece. The logo rises from below the frame while flipping three times, passes the center a little and settles on it with a soft shadow. It then glides left, shrinking a little, and uncovers the title; the date line follows; a band of frosted glass rises from the bottom edge, carrying the footer as a notice next to a phone under a red "not allowed" sign, and everything above moves up to make room. It plays on the stage and in the slideshow, and stands still in the slide panel.
+- Backdrop behind the bumper: a bright frame with a breath of sky at the top and slow waves of light blue along the bottom, moving on their own.
 - `{n}` in a cover title stands for which Sunday of the month the service falls on.
 - Text between asterisks in a cover footer is set in italics, for words in another language.
 - Covers are dated for the coming Sunday, in Indonesian, until presentations carry their own date.

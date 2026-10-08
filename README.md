@@ -155,7 +155,7 @@ The cover of a church that has a logo is a bumper: a short motion piece that rep
 1. The logo comes up from below the frame, flipping three times around its vertical axis. It leaves fast, slows down, passes the center by a little and sinks back onto it. A soft shadow follows it.
 2. It glides to the left, shrinking a little, and uncovers the title, which comes out from behind it.
 3. The date line appears under the title, moving in from the left. It is smaller than the title by the golden ratio.
-4. When the cover has a footer, everything moves up and a band of frosted glass fades in along the bottom of the frame, from edge to edge. It carries the footer as a notice, next to a phone under a red "not allowed" sign.
+4. When the cover has a footer, a band of frosted glass rises from the bottom edge, as wide as the frame, and everything above moves up to make room. The band carries the footer as a notice, next to a phone under a red "not allowed" sign.
 5. Everything rests, then fades out, and the next round starts from an empty frame.
 
 The text comes from the cover slide:
@@ -165,9 +165,11 @@ The text comes from the cover slide:
 - **Notice.** The footer of the cover, meant for the request to silence phones. Text between asterisks is set in italics, for words in another language: "Handphone mohon dimatikan atau *silent*". Without a footer there is no band and nothing moves up.
 - The subtitle has no place in the bumper yet.
 
-The bumper plays on the stage and in the slideshow. The slide panel shows it at rest. A cover of a church without a logo shows its title, subtitle and footer as plain text.
+Behind the bumper lies a backdrop: a bright, mostly white frame with a breath of sky at the top and three slow waves of light blue along the bottom. The waves keep moving on their own and do not start over with each round, and the band of glass blurs them as it rises.
 
-The motion is in `apps/admin/src/features/templates/bumper.tsx`, with every timing and size at the top of the file, and the date in `service-date.ts`. It runs on the Web Animations API, so it does not depend on a stylesheet, and it plays even when the system asks for reduced motion, because it is content like a video. Logos ship with the app for now, in `apps/admin/public/logos`, listed by church slug in `church-logo.ts`. Churches cannot upload their own yet.
+The bumper and its backdrop play on the stage and in the slideshow. The slide panel shows them at rest. A cover of a church without a logo shows its title, subtitle and footer as plain text.
+
+The motion is in `apps/admin/src/features/templates/bumper.tsx`, with every timing and size at the top of the file, the backdrop in `backdrop.tsx` and the date in `service-date.ts`. It runs on the Web Animations API, so it does not depend on a stylesheet, and it plays even when the system asks for reduced motion, because it is content like a video. Logos ship with the app for now, in `apps/admin/public/logos`, listed by church slug in `church-logo.ts`. Churches cannot upload their own yet.
 
 The editor can rename a template so far. Adding, changing, moving and removing slides is not built yet, and neither are weekly presentations. The first template, "Liturgi Umum" for GKJ Sentolo, comes from `pnpm db:seed`.
 

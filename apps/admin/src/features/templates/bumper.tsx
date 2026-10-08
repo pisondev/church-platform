@@ -15,8 +15,8 @@ import { emphasize } from "./emphasis";
 //   2. It glides to the left, shrinking a little, and uncovers the title, which comes
 //      out from behind it.
 //   3. The date line appears under the title, moving in from the left.
-//   4. With a notice: everything moves up and a band of frosted glass fades in along
-//      the bottom of the frame, carrying the notice.
+//   4. With a notice: a band of frosted glass rises from the bottom edge, carrying the
+//      notice, and everything moves up to make room for it.
 //   5. Everything rests, fades out, and the frame is empty for a moment.
 
 export const LOOP_MS = 14000;
@@ -27,9 +27,7 @@ const SLIDE_MS = 1100;
 const DATE_AT_MS = 3100;
 const DATE_MS = 700;
 const RAISE_AT_MS = 4000;
-const RAISE_MS = 900;
-const NOTICE_AT_MS = 4700;
-const NOTICE_MS = 800;
+const RAISE_MS = 1100;
 const FADE_AT_MS = 13000;
 const FADE_MS = 500;
 
@@ -123,12 +121,13 @@ export const DATE_KEYFRAMES: Keyframe[] = [
   { offset: 1, opacity: 1, transform: "translateX(0cqw)" },
 ];
 
-// The band only fades in, as the group above it finishes moving up.
-export const NOTICE_KEYFRAMES: Keyframe[] = [
-  { offset: 0, opacity: 0 },
-  { offset: at(NOTICE_AT_MS), opacity: 0, easing: "ease-out" },
-  { offset: at(NOTICE_AT_MS + NOTICE_MS), opacity: 1 },
-  { offset: 1, opacity: 1 },
+// The band comes up from below the bottom edge to its full height, in the same time and
+// at the same pace as the group above it moves up. It does not fade.
+export const BAND_KEYFRAMES: Keyframe[] = [
+  { offset: 0, transform: "translateY(100%)" },
+  { offset: at(RAISE_AT_MS), transform: "translateY(100%)", easing: GLIDE },
+  { offset: at(RAISE_AT_MS + RAISE_MS), transform: "translateY(0%)" },
+  { offset: 1, transform: "translateY(0%)" },
 ];
 
 // Each round ends on an empty frame, so the next one starts clean.
@@ -169,8 +168,8 @@ const TITLE_STYLE = gradientText("#0a1f5c", "#1d4ed8", TITLE_SIZE);
 const DATE_STYLE = gradientText("#064e3b", "#0f766e", DATE_SIZE);
 
 // The notice sits on a band of frosted glass that spans the frame from edge to edge and
-// reaches its bottom. The band is barely tinted and blurs whatever is behind it. Text and
-// phone are a neutral dark, apart from the colors of the title.
+// reaches its bottom. The band is a thin white film that blurs whatever is behind it.
+// Text and phone are a neutral dark, apart from the colors of the title.
 const BAND_BLUR = `blur(${cqw(1.6)}) saturate(1.4)`;
 const BAND_STYLE: CSSProperties = {
   height: cqw(BAND_HEIGHT),
@@ -178,9 +177,9 @@ const BAND_STYLE: CSSProperties = {
   padding: `0 ${cqw(5)}`,
   fontSize: cqw(2.6),
   color: "#0f172a",
-  background: "rgb(15 23 42 / 0.045)",
-  borderTop: `${cqw(0.1)} solid rgb(15 23 42 / 0.1)`,
-  boxShadow: `inset 0 ${cqw(0.1)} 0 rgb(255 255 255 / 0.9)`,
+  background: "rgb(255 255 255 / 0.5)",
+  borderTop: `${cqw(0.1)} solid rgb(255 255 255 / 0.95)`,
+  boxShadow: `0 ${cqw(-0.3)} ${cqw(1.4)} rgb(15 23 42 / 0.07)`,
   backdropFilter: BAND_BLUR,
   WebkitBackdropFilter: BAND_BLUR,
 };
@@ -229,7 +228,7 @@ export function Bumper({
       [spin, SPIN_KEYFRAMES],
       [heading, TITLE_KEYFRAMES],
       [dateLine, DATE_KEYFRAMES],
-      [warning, NOTICE_KEYFRAMES],
+      [warning, BAND_KEYFRAMES],
     ];
     let running: Animation[] = [];
     const show = () => {

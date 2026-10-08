@@ -4,6 +4,7 @@ import { BookOpen, Music } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { Backdrop } from "./backdrop";
 import { Bumper } from "./bumper";
 import { churchLogo } from "./church-logo";
 import { emphasize } from "./emphasis";
@@ -93,8 +94,9 @@ function Reading({ title, lines, page, pages }: { title?: string; lines: Reading
 
 type FrameChurch = Pick<Church, "name" | "slug">;
 
-// The cover of a church that has a logo is a bumper: the logo, the title, the date and
-// the footer as a notice. Any other cover shows its title, subtitle and footer.
+// The cover of a church that has a logo is a bumper over a moving backdrop: the logo, the
+// title, the date and the footer as a notice. Any other cover shows its title, subtitle
+// and footer.
 function CoverFrame({
   content,
   church,
@@ -112,14 +114,19 @@ function CoverFrame({
   if (!logo) return <Cover {...content} title={title} />;
 
   return (
-    <Bumper
-      logo={logo}
-      church={church.name}
-      title={title}
-      date={serviceDateLine(sunday)}
-      notice={content.footer}
-      live={live}
-    />
+    <div className="relative h-full">
+      <Backdrop live={live} />
+      <div className="relative h-full">
+        <Bumper
+          logo={logo}
+          church={church.name}
+          title={title}
+          date={serviceDateLine(sunday)}
+          notice={content.footer}
+          live={live}
+        />
+      </div>
+    </div>
   );
 }
 
