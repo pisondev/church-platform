@@ -18,6 +18,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
+	"github.com/pisondev/church-platform/apps/api/internal/auth"
 	"github.com/pisondev/church-platform/apps/api/internal/config"
 	"github.com/pisondev/church-platform/apps/api/internal/database"
 	"github.com/pisondev/church-platform/apps/api/internal/seed"
@@ -85,12 +86,30 @@ func serve(ctx context.Context, cfg config.Config, pool *pgxpool.Pool, logger *s
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	// Without OAuth credentials the provider stays nil and the sign-in routes answer 503.
+	var provider auth.Provider
+	if cfg.Google.Configured() {
+		provider = auth.NewGoogle(cfg.Google.ClientID, cfg.Google.ClientSecret, cfg.Google.RedirectURL)
+	} else {
+		logger.Warn("Google sign-in is not configured")
+	}
+	authHandler := auth.NewHandler(auth.Options{
+		Provider:      provider,
+		Store:         auth.NewPostgresStore(pool),
+		Logger:        logger,
+		AdminURL:      cfg.AdminURL,
+		WebURL:        cfg.WebURL,
+		SecureCookies: cfg.Env == config.EnvProduction,
+		CookieDomain:  cfg.CookieDomain,
+	})
+
 	srv := &http.Server{
 		Addr: cfg.HTTPAddr,
 		Handler: server.NewRouter(server.Options{
 			Logger:         logger,
 			AllowedOrigins: cfg.AllowedOrigins,
 			DB:             pool,
+			Features:       []server.Routes{authHandler},
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}

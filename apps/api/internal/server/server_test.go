@@ -105,7 +105,7 @@ func TestUnknownRouteAndMethod(t *testing.T) {
 		t.Errorf("unknown route: status = %d, body = %s", rec.Code, rec.Body.String())
 	}
 
-	rec = do(router, http.MethodPost, "/healthz", nil)
+	rec = do(router, http.MethodPost, "/healthz", map[string]string{"Origin": allowedOrigin})
 	if rec.Code != http.StatusMethodNotAllowed || errorCode(t, rec) != "method_not_allowed" {
 		t.Errorf("wrong method: status = %d, body = %s", rec.Code, rec.Body.String())
 	}
@@ -164,5 +164,50 @@ func TestPanicBecomesInternalError(t *testing.T) {
 	rec := do(router, http.MethodGet, "/boom", nil)
 	if rec.Code != http.StatusInternalServerError || errorCode(t, rec) != "internal_error" {
 		t.Errorf("status = %d, body = %s", rec.Code, rec.Body.String())
+	}
+}
+
+type echoFeature struct{}
+
+func (echoFeature) Register(api gin.IRouter) {
+	api.POST("/echo", func(c *gin.Context) { c.Status(http.StatusNoContent) })
+	api.GET("/echo", func(c *gin.Context) { c.Status(http.StatusNoContent) })
+}
+
+func TestFeaturesAreMountedUnderAPIv1(t *testing.T) {
+	router := NewRouter(Options{
+		Logger:         slog.New(slog.NewTextHandler(io.Discard, nil)),
+		AllowedOrigins: []string{allowedOrigin},
+		Features:       []Routes{echoFeature{}},
+	})
+
+	if rec := do(router, http.MethodGet, "/api/v1/echo", nil); rec.Code != http.StatusNoContent {
+		t.Errorf("GET /api/v1/echo: status = %d, want 204", rec.Code)
+	}
+}
+
+func TestStateChangingRequestsNeedAnAllowedOrigin(t *testing.T) {
+	router := NewRouter(Options{
+		Logger:         slog.New(slog.NewTextHandler(io.Discard, nil)),
+		AllowedOrigins: []string{allowedOrigin},
+		Features:       []Routes{echoFeature{}},
+	})
+
+	tests := []struct {
+		name     string
+		headers  map[string]string
+		wantCode int
+	}{
+		{"allowed origin", map[string]string{"Origin": allowedOrigin}, http.StatusNoContent},
+		{"no origin", nil, http.StatusForbidden},
+		{"foreign origin", map[string]string{"Origin": "https://evil.example"}, http.StatusForbidden},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := do(router, http.MethodPost, "/api/v1/echo", tt.headers)
+			if rec.Code != tt.wantCode {
+				t.Errorf("status = %d, want %d", rec.Code, tt.wantCode)
+			}
+		})
 	}
 }

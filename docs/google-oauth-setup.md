@@ -2,7 +2,7 @@
 
 EccleService signs users in with Google. The API runs the OAuth authorization code flow and keeps the session in an httpOnly cookie. Only emails registered in EccleService can sign in.
 
-Sign-in is not implemented yet. This guide prepares the Google side so the credentials are ready.
+This guide sets up the Google side. The API reads the resulting credentials from `.env`; without them the sign-in endpoints answer 503.
 
 ## 1. Create the project
 
@@ -48,7 +48,7 @@ GOOGLE_OAUTH_CLIENT_SECRET=...
 GOOGLE_OAUTH_REDIRECT_URL=http://localhost:4000/api/v1/auth/google/callback
 ```
 
-That is everything the implementation needs: the client ID, the client secret, and the list of test users.
+Restart the API after changing them. A user can sign in once two things are true: their email is a test user in Google, and it exists in the `users` table.
 
 ## Before going public
 

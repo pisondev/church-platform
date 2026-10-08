@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/pisondev/church-platform/apps/api/internal/httpx"
 )
 
 const readinessTimeout = 2 * time.Second
@@ -17,14 +19,20 @@ type Pinger interface {
 	Ping(ctx context.Context) error
 }
 
+// Routes is a feature that mounts its endpoints under /api/v1.
+type Routes interface {
+	Register(api gin.IRouter)
+}
+
 // Options configures NewRouter.
 type Options struct {
 	Logger         *slog.Logger
 	AllowedOrigins []string
 	DB             Pinger
+	Features       []Routes
 }
 
-// NewRouter returns the API router with middleware and base routes attached.
+// NewRouter returns the API router with middleware and routes attached.
 func NewRouter(opts Options) *gin.Engine {
 	logger := opts.Logger
 	if logger == nil {
@@ -33,18 +41,29 @@ func NewRouter(opts Options) *gin.Engine {
 
 	router := gin.New()
 	router.HandleMethodNotAllowed = true
-	router.Use(requestID(), accessLog(logger), recovery(logger), corsPolicy(opts.AllowedOrigins))
+	router.Use(
+		requestID(),
+		accessLog(logger),
+		recovery(logger),
+		corsPolicy(opts.AllowedOrigins),
+		trustedOrigin(opts.AllowedOrigins),
+	)
 
 	router.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 	router.GET("/readyz", readiness(opts.DB))
 
+	api := router.Group("/api/v1")
+	for _, feature := range opts.Features {
+		feature.Register(api)
+	}
+
 	router.NoRoute(func(c *gin.Context) {
-		writeError(c, http.StatusNotFound, "not_found", "resource not found")
+		httpx.Error(c, http.StatusNotFound, "not_found", "resource not found")
 	})
 	router.NoMethod(func(c *gin.Context) {
-		writeError(c, http.StatusMethodNotAllowed, "method_not_allowed", "method not allowed")
+		httpx.Error(c, http.StatusMethodNotAllowed, "method_not_allowed", "method not allowed")
 	})
 
 	return router
@@ -57,16 +76,9 @@ func readiness(db Pinger) gin.HandlerFunc {
 		defer cancel()
 
 		if db == nil || db.Ping(ctx) != nil {
-			writeError(c, http.StatusServiceUnavailable, "database_unavailable", "database is not reachable")
+			httpx.Error(c, http.StatusServiceUnavailable, "database_unavailable", "database is not reachable")
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"status": "ready"})
 	}
-}
-
-// writeError sends the error envelope shared by every endpoint.
-func writeError(c *gin.Context, status int, code, message string) {
-	c.AbortWithStatusJSON(status, gin.H{
-		"error": gin.H{"code": code, "message": message},
-	})
 }

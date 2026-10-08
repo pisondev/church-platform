@@ -6,10 +6,13 @@ import (
 	"log/slog"
 	"net/http"
 	"regexp"
+	"slices"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"github.com/pisondev/church-platform/apps/api/internal/httpx"
 )
 
 const (
@@ -71,7 +74,7 @@ func recovery(logger *slog.Logger) gin.HandlerFunc {
 			slog.Any("panic", recovered),
 			slog.String("request_id", c.GetString(requestIDKey)),
 		)
-		writeError(c, http.StatusInternalServerError, "internal_error", "internal server error")
+		httpx.Error(c, http.StatusInternalServerError, "internal_error", "internal server error")
 	})
 }
 
@@ -85,4 +88,21 @@ func corsPolicy(origins []string) gin.HandlerFunc {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	})
+}
+
+// trustedOrigin makes every state-changing request name an allowed Origin. Sessions live
+// in a cookie, so this keeps other sites from acting on behalf of a signed-in user.
+func trustedOrigin(origins []string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		switch c.Request.Method {
+		case http.MethodGet, http.MethodHead, http.MethodOptions:
+			c.Next()
+			return
+		}
+		if !slices.Contains(origins, c.GetHeader("Origin")) {
+			httpx.Error(c, http.StatusForbidden, "forbidden_origin", "request origin is not allowed")
+			return
+		}
+		c.Next()
+	}
 }

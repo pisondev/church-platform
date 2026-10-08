@@ -64,8 +64,12 @@ The API reads environment variables, and loads `.env` from the repository root i
 | `APP_ENV` | `development` | `development`, `test` or `production` |
 | `API_ADDR` | `:4000` | Listen address |
 | `DATABASE_URL` | required | PostgreSQL connection string |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:3100,http://localhost:3101` | Origins allowed to call the API with credentials |
+| `WEB_URL` | `http://localhost:3100` | Public site. Failed sign-ins return here |
+| `ADMIN_URL` | `http://localhost:3101` | Admin panel. Successful sign-ins land here |
+| `CORS_ALLOWED_ORIGINS` | `WEB_URL` and `ADMIN_URL` | Origins allowed to call the API with credentials |
+| `COOKIE_DOMAIN` | empty | Domain of the session cookie, for example `.example.org` when the apps use subdomains |
 | `SUPER_ADMIN_EMAILS` | empty | Emails that hold the Super Admin role |
+| `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URL` | empty | OAuth client for sign-in, see [Google sign-in setup](docs/google-oauth-setup.md). Required in production |
 
 The frontends read these at build time:
 
@@ -83,6 +87,7 @@ Migrations are plain SQL files in `apps/api/internal/database/migrations`, embed
 | `churches` | Tenants. Every church-owned table references one |
 | `users` | Accounts, matched to Google sign-ins by email. `is_super_admin` marks platform owners |
 | `church_admins` | Which users administer which churches |
+| `sessions` | Signed-in browsers. Holds the SHA-256 of each session token, never the token |
 
 Churches and users are soft-deleted through `deleted_at`. Emails are stored lowercase.
 
@@ -96,6 +101,14 @@ Database tests need `TEST_DATABASE_URL`. Each test runs in its own schema and dr
 | --- | --- |
 | `GET /healthz` | Liveness: the process is up |
 | `GET /readyz` | Readiness: the database answers |
+| `GET /api/v1/auth/google/start` | Starts Google sign-in. `?redirect=/path` chooses the admin page to land on |
+| `GET /api/v1/auth/google/callback` | Finishes sign-in, sets the session cookie and redirects |
+| `GET /api/v1/auth/me` | The signed-in user and the churches they manage, or 401 |
+| `POST /api/v1/auth/logout` | Ends the session |
+
+Sign-in is Google only and limited to emails that already exist in `users`: Super Admins come from `SUPER_ADMIN_EMAILS` through `pnpm db:seed`. The session is an opaque token in an httpOnly, SameSite=Lax cookie that lasts 7 days. A failed sign-in redirects to `WEB_URL/login?error=<reason>`.
+
+Every state-changing request must carry an `Origin` header from the allowed origins, otherwise it gets 403.
 
 Errors use one envelope: `{"error": {"code": "not_found", "message": "resource not found"}}`. Every response carries an `X-Request-ID` header, reused from the request when well formed.
 
