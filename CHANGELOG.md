@@ -10,3 +10,5 @@ All notable changes are recorded here. The format follows [Keep a Changelog](htt
 - `commit-msg` hook that rejects AI attribution, with tests and a range checker for CI.
 - `pre-push` hook that runs the unit tests.
 - `.env.example` listing the runtime configuration.
+- API service (Go, Gin) with environment-based configuration, request IDs, structured access logs, panic recovery, CORS for the frontends, and `/healthz` and `/readyz`.
+- Docker Compose service for local PostgreSQL, with a separate test database.

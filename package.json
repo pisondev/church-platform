@@ -7,7 +7,15 @@
   },
   "scripts": {
     "prepare": "node scripts/install-hooks.mjs",
-    "test": "pnpm run test:hooks",
-    "test:hooks": "node --test scripts/commit-msg-hook.test.mjs"
+    "dev:api": "go -C apps/api run ./cmd/api serve",
+    "db:up": "docker compose up -d --wait postgres",
+    "db:down": "docker compose down",
+    "lint": "pnpm run lint:api",
+    "lint:api": "go -C apps/api vet ./...",
+    "test": "pnpm run test:hooks && pnpm run test:api",
+    "test:hooks": "node --test scripts/commit-msg-hook.test.mjs",
+    "test:api": "go -C apps/api test ./...",
+    "build": "pnpm run build:api",
+    "build:api": "go -C apps/api build -o bin/ ./cmd/api"
   }
 }
